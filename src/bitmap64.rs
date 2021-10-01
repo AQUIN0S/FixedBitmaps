@@ -3,10 +3,11 @@ use std::{
     fmt::Display,
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign},
 };
+use serde::{Serialize, Deserialize};
 
 const MAP_LENGTH: u64 = 64;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize)]
 pub struct Bitmap64(u64);
 
 impl Bitmap64 {
@@ -19,7 +20,7 @@ impl Bitmap64 {
             return None;
         }
 
-        let mut bitmap = Bitmap64::from(0);
+        let mut bitmap = Bitmap64::default();
         bitmap.set(index, true).unwrap();
         Some(bitmap)
     }
@@ -117,3 +118,7 @@ impl BitXorAssign for Bitmap64 {
         self.0 ^= rhs.0;
     }
 }
+
+// impl Serialize for Bitmap64 {
+
+// }
