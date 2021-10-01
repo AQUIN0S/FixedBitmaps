@@ -118,7 +118,3 @@ impl BitXorAssign for Bitmap64 {
         self.0 ^= rhs.0;
     }
 }
-
-// impl Serialize for Bitmap64 {
-
-// }
