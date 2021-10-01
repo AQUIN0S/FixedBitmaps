@@ -6,6 +6,7 @@ use std::{
 
 const MAP_LENGTH: u64 = 64;
 
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct Bitmap64(u64);
 
 impl Bitmap64 {
