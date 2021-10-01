@@ -2,7 +2,7 @@
 name = "fixed_bitmaps"
 version = "0.1.0"
 edition = "2018"
-licence = "MIT License"
+licence = "Apache-2.0"
 description = "A small crate implementing bitmap functionality around primitive Rust unsigned integers."
 repository = "https://github.com/AQUIN0S/FixedBitmaps"
 readme = "README.md"
