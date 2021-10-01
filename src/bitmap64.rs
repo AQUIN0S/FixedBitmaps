@@ -1,5 +1,8 @@
 use core::fmt::Formatter;
-use std::{fmt::Display, ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign}};
+use std::{
+    fmt::Display,
+    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign},
+};
 
 const MAP_LENGTH: u64 = 64;
 
