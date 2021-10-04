@@ -1,13 +1,15 @@
 use core::fmt::Formatter;
+use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign},
 };
-use serde::{Serialize, Deserialize};
 
 const MAP_LENGTH: u64 = 64;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,
+)]
 pub struct Bitmap64(u64);
 
 impl Bitmap64 {
