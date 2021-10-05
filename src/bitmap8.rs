@@ -5,52 +5,53 @@ use std::{
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign},
 };
 
-const MAP_LENGTH: u64 = 64;
+const MAP_LENGTH: u64 = 8;
 
-/// The most common bitmap used, as most modern architecture is now 64-bit, as mentioned in the Rust documentation somewhere...
+/// The smallest denomination of bitmap in this crate. This is simply a byte-long bitmap,
+/// useful for when only a few flags would be defined.
 ///
 /// # Examples
 /// ```rust
 /// // Creates an empty bitmap
-/// let mut bitmap = Bitmap64::default();
+/// let mut bitmap = Bitmap8::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
-/// // Will show 0000000000000000000000000000000000000000000000000000000000000000
+/// // Will show 00000000
 /// println!("Default bitmap: {}", bitmap);
 ///
 /// // Bitmaps also convert to their respective unsigned int versions and back again easily
 /// // Will show 0 as the value of the bitmap
-/// println!("Value of bitmap: {}", bitmap.to_u64());
+/// println!("Value of bitmap: {}", bitmap.to_u8());
 ///
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= Bitmap64::from(101);
 ///
-/// // Will show 0000000000000000000000000000000000000000000000000000000001100101
+/// // Will show 01100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
-/// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to remove the warning,
-/// //as we know for certain that 4 < 63
+/// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
+/// //as we know for certain that 4 < 8
 /// bitmap.set(4, true).unwrap();
 ///
-/// // Will show that 117 is the value of the bitmap
+/// // Will show that 117 (101 + 2^4) is the value of the bitmap
 /// println!("Bitmap value: {}", bitmap.to_u64());
 /// ```
 #[derive(
     PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,
 )]
-pub struct Bitmap64(u64);
+pub struct Bitmap8(u8);
 
-impl Bitmap64 {
-    pub fn to_u64(&self) -> u64 {
+impl Bitmap8 {
+    pub fn to_u8(&self) -> u8 {
         self.0
     }
 
-    pub fn from_set(index: u64) -> Option<Bitmap64> {
+    pub fn from_set(index: u64) -> Option<Bitmap8> {
         if index >= MAP_LENGTH {
             return None;
         }
 
-        let mut bitmap = Bitmap64::default();
+        let mut bitmap = Bitmap8::default();
         bitmap.set(index, true).unwrap();
         Some(bitmap)
     }
@@ -69,7 +70,7 @@ impl Bitmap64 {
             let mask = 1 << index;
             self.0 |= mask;
         } else {
-            let mask = u64::MAX - (1 << index);
+            let mask = u8::MAX - (1 << index);
             self.0 &= mask;
         }
 
@@ -91,13 +92,13 @@ impl Bitmap64 {
     }
 }
 
-impl From<u64> for Bitmap64 {
-    fn from(value: u64) -> Self {
-        Bitmap64(value)
+impl From<u8> for Bitmap8 {
+    fn from(value: u8) -> Self {
+        Bitmap8(value)
     }
 }
 
-impl Display for Bitmap64 {
+impl Display for Bitmap8 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         let mut bitmap = String::new();
         for i in 0..MAP_LENGTH {
@@ -107,7 +108,7 @@ impl Display for Bitmap64 {
     }
 }
 
-impl BitAnd for Bitmap64 {
+impl BitAnd for Bitmap8 {
     type Output = Self;
 
     fn bitand(self, rhs: Self) -> Self::Output {
@@ -115,13 +116,13 @@ impl BitAnd for Bitmap64 {
     }
 }
 
-impl BitAndAssign for Bitmap64 {
+impl BitAndAssign for Bitmap8 {
     fn bitand_assign(&mut self, rhs: Self) {
         self.0 &= rhs.0;
     }
 }
 
-impl BitOr for Bitmap64 {
+impl BitOr for Bitmap8 {
     type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
@@ -129,13 +130,13 @@ impl BitOr for Bitmap64 {
     }
 }
 
-impl BitOrAssign for Bitmap64 {
+impl BitOrAssign for Bitmap8 {
     fn bitor_assign(&mut self, rhs: Self) {
         self.0 |= rhs.0;
     }
 }
 
-impl BitXor for Bitmap64 {
+impl BitXor for Bitmap8 {
     type Output = Self;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
@@ -143,7 +144,7 @@ impl BitXor for Bitmap64 {
     }
 }
 
-impl BitXorAssign for Bitmap64 {
+impl BitXorAssign for Bitmap8 {
     fn bitxor_assign(&mut self, rhs: Self) {
         self.0 ^= rhs.0;
     }
