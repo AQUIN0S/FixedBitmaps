@@ -2,7 +2,10 @@ use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
-    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign},
+    ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        DivAssign, Mul, MulAssign, Sub, SubAssign,
+    },
 };
 
 const MAP_LENGTH: u64 = 8;
@@ -87,7 +90,7 @@ impl Bitmap8 {
     pub fn get(&self, index: u64) -> Result<bool, String> {
         if index >= MAP_LENGTH {
             return Err(String::from(
-                "Tried to set bit that's out of range of the bitmap (range: ",
+                "Tried to get bit that's out of range of the bitmap (range: ",
             ) + &MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
@@ -114,6 +117,8 @@ impl Display for Bitmap8 {
         write!(f, "{}", bitmap.chars().rev().collect::<String>())
     }
 }
+
+// Traits implementing bitwise operations between Bitmaps of the same type
 
 impl BitAnd for Bitmap8 {
     type Output = Self;
@@ -154,5 +159,165 @@ impl BitXor for Bitmap8 {
 impl BitXorAssign for Bitmap8 {
     fn bitxor_assign(&mut self, rhs: Self) {
         self.0 ^= rhs.0;
+    }
+}
+
+// Traits implementing arithmetic operations between Bitmaps of the same type
+
+impl Add for Bitmap8 {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+
+impl AddAssign for Bitmap8 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.0 += rhs.0;
+    }
+}
+
+impl Sub for Bitmap8 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
+    }
+}
+
+impl SubAssign for Bitmap8 {
+    fn sub_assign(&mut self, rhs: Self) {
+        self.0 -= rhs.0;
+    }
+}
+
+impl Mul for Bitmap8 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self(self.0 * rhs.0)
+    }
+}
+
+impl MulAssign for Bitmap8 {
+    fn mul_assign(&mut self, rhs: Self) {
+        self.0 *= rhs.0;
+    }
+}
+
+impl Div for Bitmap8 {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self(self.0 / rhs.0)
+    }
+}
+
+impl DivAssign for Bitmap8 {
+    fn div_assign(&mut self, rhs: Self) {
+        self.0 /= rhs.0;
+    }
+}
+
+// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+
+impl BitAnd<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn bitand(self, rhs: u8) -> Self::Output {
+        Self(self.0 & rhs)
+    }
+}
+
+impl BitAndAssign<u8> for Bitmap8 {
+    fn bitand_assign(&mut self, rhs: u8) {
+        self.0 &= rhs;
+    }
+}
+
+impl BitOr<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn bitor(self, rhs: u8) -> Self::Output {
+        Self(self.0 | rhs)
+    }
+}
+
+impl BitOrAssign<u8> for Bitmap8 {
+    fn bitor_assign(&mut self, rhs: u8) {
+        self.0 |= rhs;
+    }
+}
+
+impl BitXor<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn bitxor(self, rhs: u8) -> Self::Output {
+        Self(self.0 ^ rhs)
+    }
+}
+
+impl BitXorAssign<u8> for Bitmap8 {
+    fn bitxor_assign(&mut self, rhs: u8) {
+        self.0 ^= rhs;
+    }
+}
+
+// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+
+impl Add<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn add(self, rhs: u8) -> Self::Output {
+        Self(self.0 + rhs)
+    }
+}
+
+impl AddAssign<u8> for Bitmap8 {
+    fn add_assign(&mut self, rhs: u8) {
+        self.0 += rhs;
+    }
+}
+
+impl Sub<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn sub(self, rhs: u8) -> Self::Output {
+        Self(self.0 - rhs)
+    }
+}
+
+impl SubAssign<u8> for Bitmap8 {
+    fn sub_assign(&mut self, rhs: u8) {
+        self.0 -= rhs;
+    }
+}
+
+impl Mul<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn mul(self, rhs: u8) -> Self::Output {
+        Self(self.0 * rhs)
+    }
+}
+
+impl MulAssign<u8> for Bitmap8 {
+    fn mul_assign(&mut self, rhs: u8) {
+        self.0 *= rhs;
+    }
+}
+
+impl Div<u8> for Bitmap8 {
+    type Output = Self;
+
+    fn div(self, rhs: u8) -> Self::Output {
+        Self(self.0 / rhs)
+    }
+}
+
+impl DivAssign<u8> for Bitmap8 {
+    fn div_assign(&mut self, rhs: u8) {
+        self.0 /= rhs;
     }
 }
