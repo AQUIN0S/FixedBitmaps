@@ -7,7 +7,7 @@ use std::{
 
 const MAP_LENGTH: u64 = 64;
 
-/// The most common bitmap used, as most modern architecture is now 64-bit, as mentioned in the Rust documentation somewhere...
+/// A bitmap of length 64. This would be the most commonly used one, and fastest on 64-bit architectures.
 ///
 /// # Examples
 /// ```rust
@@ -45,6 +45,13 @@ impl Bitmap64 {
         self.0
     }
 
+    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning.
+    ///
+    /// This is equivalent to:
+    /// ```rust
+    /// let mut bitmap = Bitmap64::from(0);
+    /// bitmap.set(index);
+    /// ```
     pub fn from_set(index: u64) -> Option<Bitmap64> {
         if index >= MAP_LENGTH {
             return None;
