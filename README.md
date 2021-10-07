@@ -6,7 +6,7 @@ These bitmaps are simply for when you want a data structure to hold boolean flag
 
 ## Features
 
-- There are now wrappings for all basic types of unsigned integers, from `u8` up to `u128`.
+- There are now wrappings for all basic types of unsigned integers, from `u8` up to `u128`, along with a wrapper for `usize` (`BitmapArch`).
 - Both bitwise (and, or, xor) and arithmetic (add, subtract, multiply, divide) operations supported between bitmaps, and between bitmaps and their respective integer type.
 - Implements `Display` to show the bitmap in all its 1's and 0's glory. (May end up changing this to the `Debug` trait however, that'll have to be something to think about before releasing 1.0.0).
 - Easy conversion between a `Bitmap` and the integer type it's associated with. For example, a `Bitmap64` and a `u64` can easily be converted back and forth like the following:
@@ -24,12 +24,11 @@ These bitmaps are simply for when you want a data structure to hold boolean flag
 
 ## To be done
 
-- I'm also thinking of implementing a wrapper for `usize`, which I imagine will be the fastest type to use in general production when it doesn't matter whether you want a bitmap length of 32 or 64.
 - Documentation is always something to be improved, any documentation changes or minor bug fixes result in a patch update.
 - Anytime a new structure is defined and implemented, a minor update will be published.
 - When this has been fully tested and benchmarked, and any other important components I might have missed have been added, I will publish fixed_bitmaps 1.0.0 as a major update, to indicate its readyness for full production.
 - Bitwise shifts would probably be a good next step.
-- I'm also considering using the dereference operator as an extra option to convert a bitmap back to its integer type.
+- I'm also considering using the dereference operator as an extra option to convert a bitmap back to its integer type. This will be one thing to consider before moving to 1.0.0
 
 ## Contributions
 
