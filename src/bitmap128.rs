@@ -15,6 +15,8 @@ const MAP_LENGTH: u64 = 128;
 /// # Examples
 /// ```rust
 /// // Creates an empty bitmap
+/// use fixed_bitmaps::Bitmap128;
+///
 /// let mut bitmap = Bitmap128::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
@@ -26,7 +28,7 @@ const MAP_LENGTH: u64 = 128;
 /// println!("Value of bitmap: {}", bitmap.to_u128());
 ///
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
-/// bitmap |= Bitmap64::from(101);
+/// bitmap |= Bitmap128::from(101);
 ///
 /// // Will show 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
@@ -36,7 +38,7 @@ const MAP_LENGTH: u64 = 128;
 /// bitmap.set(4, true).unwrap();
 ///
 /// // Will show that 117 (101 + 2^4) is the value of the bitmap
-/// println!("Bitmap value: {}", bitmap.to_u64());
+/// println!("Bitmap value: {}", bitmap.to_u128());
 /// ```
 #[derive(
     PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,

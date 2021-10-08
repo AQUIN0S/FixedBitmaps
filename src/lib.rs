@@ -7,9 +7,9 @@
 //! the power of the index. For example, the following example sets the 5th bit to true in an otherwise empty bitmap. This is equivalent
 //! to adding 2<sup>5</sup> () to the underlying value:
 //! ```rust
-//! using fixed_bitmaps::Bitmap64;
+//! use fixed_bitmaps::Bitmap64;
 //!
-//! let mut bitmap = Bitmap64::default;
+//! let mut bitmap = Bitmap64::default();
 //!
 //! // Set the 5th index (the 6th bit) to true.
 //! // Can simply unwrap the result to remove the warning, as we know

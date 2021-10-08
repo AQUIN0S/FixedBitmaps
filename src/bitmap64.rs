@@ -10,10 +10,12 @@ use std::{
 
 const MAP_LENGTH: u64 = 64;
 
-/// A bitmap of length 64. This would be the most commonly used one, and fastest on 64-bit architectures.
+/// A bitmap of length 64. This would be the fastest bitmap to use on 64-bit architectures.
 ///
 /// # Examples
 /// ```rust
+/// use fixed_bitmaps::Bitmap64;
+///
 /// // Creates an empty bitmap
 /// let mut bitmap = Bitmap64::default();
 ///
@@ -25,17 +27,18 @@ const MAP_LENGTH: u64 = 64;
 /// // Will show 0 as the value of the bitmap
 /// println!("Value of bitmap: {}", bitmap.to_u64());
 ///
+///
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= Bitmap64::from(101);
 ///
 /// // Will show 0000000000000000000000000000000000000000000000000000000001100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
-/// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to remove the warning,
-/// //as we know for certain that 4 < 63
+/// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
+/// //as we know for certain that 4 < 64
 /// bitmap.set(4, true).unwrap();
 ///
-/// // Will show that 117 is the value of the bitmap
+/// // Will show that 117 (101 + 2^4) is the value of the bitmap
 /// println!("Bitmap value: {}", bitmap.to_u64());
 /// ```
 #[derive(
@@ -48,12 +51,18 @@ impl Bitmap64 {
         self.0
     }
 
-    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning.
+    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning. The least significant bit is at index 0.
     ///
-    /// This is equivalent to:
+    /// ## Example
+    ///
     /// ```rust
-    /// let mut bitmap = Bitmap64::from(0);
-    /// bitmap.set(index);
+    /// use fixed_bitmaps::Bitmap64;
+    ///
+    /// let a = Bitmap64::from_set(2).unwrap();
+    /// // The above is equivalent to:
+    /// let b = Bitmap64::from(0b100);
+    ///
+    /// assert!(a == b);
     /// ```
     pub fn from_set(index: u64) -> Option<Bitmap64> {
         if index >= MAP_LENGTH {

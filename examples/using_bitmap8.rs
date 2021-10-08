@@ -31,4 +31,11 @@ fn main() {
             eprintln!("{}", error);
         }
     }
+
+    let a = Bitmap8::from_set(2).unwrap();
+
+    // The above is equivalent to:
+    let b = Bitmap8::from(0b100);
+
+    assert!(a == b);
 }

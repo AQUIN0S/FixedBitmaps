@@ -17,6 +17,8 @@ const MAP_LENGTH: u64 = (mem::size_of::<usize>() as u64) * 8;
 /// # Examples
 /// ```rust
 /// // Creates an empty bitmap
+/// use fixed_bitmaps::BitmapArch;
+///
 /// let mut bitmap = BitmapArch::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like

@@ -14,6 +14,8 @@ const MAP_LENGTH: u64 = 16;
 ///
 /// # Examples
 /// ```rust
+/// use fixed_bitmaps::Bitmap16;
+///
 /// // Creates an empty bitmap
 /// let mut bitmap = Bitmap16::default();
 ///
@@ -25,8 +27,9 @@ const MAP_LENGTH: u64 = 16;
 /// // Will show 0 as the value of the bitmap
 /// println!("Value of bitmap: {}", bitmap.to_u16());
 ///
+///
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
-/// bitmap |= Bitmap64::from(101);
+/// bitmap |= Bitmap16::from(101);
 ///
 /// // Will show 0000000001100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
@@ -36,7 +39,7 @@ const MAP_LENGTH: u64 = 16;
 /// bitmap.set(4, true).unwrap();
 ///
 /// // Will show that 117 (101 + 2^4) is the value of the bitmap
-/// println!("Bitmap value: {}", bitmap.to_u64());
+/// println!("Bitmap value: {}", bitmap.to_u16());
 /// ```
 #[derive(
     PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,
@@ -47,13 +50,18 @@ impl Bitmap16 {
     pub fn to_u16(&self) -> u16 {
         self.0
     }
-
-    /// Creates a new, empty `Bitmap16`, and sets the desired index before returning.
+    /// Creates a new, empty `Bitmap16`, and sets the desired index before returning. The least significant bit is at index 0.
     ///
-    /// This is equivalent to:
+    /// ## Example
+    ///
     /// ```rust
-    /// let mut bitmap = Bitmap16::from(0);
-    /// bitmap.set(index);
+    /// use fixed_bitmaps::Bitmap16;
+    ///
+    /// let a = Bitmap16::from_set(2).unwrap();
+    /// // The above is equivalent to:
+    /// let b = Bitmap16::from(0b100);
+    ///
+    /// assert!(a == b);
     /// ```
     pub fn from_set(index: u64) -> Option<Bitmap16> {
         if index >= MAP_LENGTH {
