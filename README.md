@@ -1,6 +1,6 @@
 # Fixed Bitmaps
 
-[![Build Status](https://app.travis-ci.com/AQUIN0S/FixedBitmaps.svg?branch=main)](https://app.travis-ci.com/AQUIN0S/FixedBitmaps)
+[![Build Status](https://app.travis-ci.com/AQUIN0S/FixedBitmaps.svg?branch=main)](https://github.com/AQUIN0S/FixedBitmaps)
 [![API](https://docs.rs/fixed_bitmaps/badge.svg)](https://docs.rs/fixed_bitmaps)
 [![crates.io](https://img.shields.io/crates/v/fixed_bitmaps.svg)](https://crates.io/crates/fixed_bitmaps)
 
