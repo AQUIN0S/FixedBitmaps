@@ -1,6 +1,7 @@
 # Fixed Bitmaps
 
-[![Build Status](https://app.travis-ci.com/AQUIN0S/FixedBitmaps.svg?branch=main)](https://app.travis-ci.com/AQUIN0S/FixedBitmaps)
+[![Build Status](https://app.travis-ci.com/AQUIN0S/FixedBitmaps.svg?branch=main)](https://app.travis-ci.com/AQUIN0S/FixedBitmaps) 
+![crates.io](https://img.shields.io/crates/v/fixed_bitmaps.svg)
 
 A small crate implementing bitmap functionality around primitive Rust unsigned integers. I ended up making this after wanting a simple data structure to use for bit flags. Other options definitely exist such as `bitmap` and `bitmaps`, but they looked intimidating, and besides, I just wanted to make a crate I was willing to publish!
 
