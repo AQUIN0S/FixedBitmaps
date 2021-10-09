@@ -31,4 +31,42 @@ fn main() {
             eprintln!("{}", error);
         }
     }
+
+    // Multiple ways to create a new bitmap
+    let _empty = Bitmap64::default();
+    let _full = Bitmap64::from(u64::MAX);
+
+    // Equivalent ways to create a bitmap with last bits 1001
+    let _bitmap = Bitmap64::from(9);
+    let _bitmap = Bitmap64::from(0b1001);
+
+    // Sets the 7th least significant bit when creating a new bitmap (indexing starts at 0)
+    let mut bitmap = Bitmap64::from_set(6).unwrap();
+
+    // Use the set() method to work with specific bits
+    bitmap.set(6, false).unwrap();
+    bitmap.set(42, true).unwrap();
+
+    // Use get() to know the value of a specific bit
+    println!("Bit at index 42: {}", bitmap.get(42).unwrap());
+
+    // Freely use boolean operators &, |, and ^
+    let bitmap1 = Bitmap64::from(0b1001);
+    let bitmap2 = Bitmap64::from(0b1010);
+
+    let _and = bitmap1 & bitmap2;
+    let _or = bitmap1 | bitmap2;
+    let _xor = bitmap1 ^ bitmap2;
+
+    // Aritmetic operators are currently used as exactly that, the following is guarunteed to continue working as it does
+    let _add = bitmap1 + 10;
+    let _sub = bitmap1 - 4;
+    let _mul = bitmap2 * 2;
+    let _div = bitmap2 / 2;
+
+    // The following works exactly as above, but is likely to change in favour of set operations in the major update to 1.0.0
+    let _add = bitmap1 + Bitmap64::from(10);
+    let _sub = bitmap1 - Bitmap64::from(4);
+    let _mul = bitmap2 * Bitmap64::from(2);
+    let _div = bitmap2 / Bitmap64::from(2);
 }

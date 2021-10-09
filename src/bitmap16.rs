@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
@@ -326,5 +326,36 @@ impl Div<u16> for Bitmap16 {
 impl DivAssign<u16> for Bitmap16 {
     fn div_assign(&mut self, rhs: u16) {
         self.0 /= rhs;
+    }
+}
+
+// Traits for left and right bitwise shifts. These really only make sense when working
+// with integers, rather than other bitmaps
+
+impl Shl<u64> for Bitmap16 {
+    type Output = Self;
+
+    fn shl(self, rhs: u64) -> Self::Output {
+        Self(self.0 << rhs)
+    }
+}
+
+impl ShlAssign<u64> for Bitmap16 {
+    fn shl_assign(&mut self, rhs: u64) {
+        self.0 <<= rhs;
+    }
+}
+
+impl Shr<u64> for Bitmap16 {
+    type Output = Self;
+
+    fn shr(self, rhs: u64) -> Self::Output {
+        Self(self.0 >> rhs)
+    }
+}
+
+impl ShrAssign<u64> for Bitmap16 {
+    fn shr_assign(&mut self, rhs: u64) {
+        self.0 >>= rhs;
     }
 }

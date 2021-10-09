@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
@@ -276,7 +276,7 @@ impl BitXorAssign<u128> for Bitmap128 {
     }
 }
 
-// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+// Traits implementing arithmetic operations between Bitmaps and their respective integer types.
 
 impl Add<u128> for Bitmap128 {
     type Output = Self;
@@ -331,5 +331,36 @@ impl Div<u128> for Bitmap128 {
 impl DivAssign<u128> for Bitmap128 {
     fn div_assign(&mut self, rhs: u128) {
         self.0 /= rhs;
+    }
+}
+
+// Traits for left and right bitwise shifts. These really only make sense when working
+// with integers, rather than other bitmaps
+
+impl Shl<u64> for Bitmap128 {
+    type Output = Self;
+
+    fn shl(self, rhs: u64) -> Self::Output {
+        Self(self.0 << rhs)
+    }
+}
+
+impl ShlAssign<u64> for Bitmap128 {
+    fn shl_assign(&mut self, rhs: u64) {
+        self.0 <<= rhs;
+    }
+}
+
+impl Shr<u64> for Bitmap128 {
+    type Output = Self;
+
+    fn shr(self, rhs: u64) -> Self::Output {
+        Self(self.0 >> rhs)
+    }
+}
+
+impl ShrAssign<u64> for Bitmap128 {
+    fn shr_assign(&mut self, rhs: u64) {
+        self.0 >>= rhs;
     }
 }
