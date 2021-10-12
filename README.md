@@ -84,6 +84,7 @@ let rsh = bitmap2 >> 1;
 - Documentation is always something to be improved, any documentation changes or minor bug fixes result in a patch update.
 - Anytime a new structure is defined and implemented, or a new function defined, a minor update will be published.
 - When this has been fully tested and benchmarked, and any other important components I might have missed have been added, I will publish fixed_bitmaps 1.0.0 as a major update, to indicate its readyness for full production.
+- The final struct to create will likely be the `BitmapLarge` struct, or something similar. This will have a set size, but the user can define what that size is. The aim is to have a struct that cannot grow or shrink, but can be given a large capacity from the beginning. This is similar to bit-vec, just without the dynamic growing property, so I think it should be easier to store on the stack rather than the heap, resulting in better performance.
 
 ## Contributions
 
