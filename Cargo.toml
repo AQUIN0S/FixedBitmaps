@@ -1,13 +1,13 @@
 [package]
 name = "fixed_bitmaps"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2018"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/fixed_bitmaps"
 description = "A small crate implementing bitmap functionality around primitive Rust unsigned integers."
 repository = "https://github.com/AQUIN0S/FixedBitmaps"
 readme = "README.md"
-keywords = ["bitmap", "bits", "bit", "flags", "fixed"]
+keywords = ["bitmap", "bits", "bit", "flags", "static"]
 categories = ["data-structures"]
 
 [dependencies]

@@ -5,7 +5,7 @@
 [![crates.io](https://img.shields.io/crates/v/fixed_bitmaps.svg)](https://crates.io/crates/fixed_bitmaps)
 [![crates.io](https://img.shields.io/crates/l/fixed_bitmaps.svg)](https://opensource.org/licenses/MIT)
 
-A small crate implementing bitmap functionality around primitive Rust unsigned integers. I ended up making this after wanting a simple data structure to use for bit flags. Other options definitely exist such as `bitmap` and `bitmaps`, but they looked intimidating, and besides, I just wanted to make a crate I was willing to publish!
+Implement bitmap functionality around primitive Rust unsigned integers. I ended up making this after wanting a simple data structure to use for bit flags. Other options definitely exist such as `bitmap` and `bitmaps`, but they looked intimidating, and besides, I just wanted to make a crate I was willing to publish!
 
 These bitmaps are simply for when you want a data structure to hold boolean flags, which can be AND-ed, OR-ed and XOR-ed together, in as compressed a format as possible, while still holding enough functionality to easily view the bitmap for display, or get a particular bit.
 
@@ -54,15 +54,15 @@ let and = bitmap1 & 0b1010;
 let or = bitmap1 | 0b1010;
 let xor = bitmap1 ^ 0b1010;
 
-// Aritmetic operators are currently used as exactly that, the following is
-// guarunteed to continue working as it does
+// Aritmetic operators are currently used as exactly that, the following
+// is guarunteed to continue working as it does
 let add = bitmap1 + 10;
 let sub = bitmap1 - 4;
 let mul = bitmap2 * 2;
 let div = bitmap2 / 2;
 
-// The following work exactly as above, but are likely to change in favour of
-// set operations in the major update to 1.0.0
+// The following works exactly as above, but is likely to change in
+// favour of set operations in the major update to 1.0.0
 let add = bitmap1 + Bitmap64::from(10);
 let sub = bitmap1 - Bitmap64::from(4);
 let mul = bitmap2 * Bitmap64::from(2);
