@@ -55,6 +55,9 @@ let and = bitmap1 & 0b1010;
 let or = bitmap1 | 0b1010;
 let xor = bitmap1 ^ 0b1010;
 
+// You can also use the not operator ! to get the flipped version of the bitmap
+let flipped = !bitmap;
+
 // Aritmetic operators are currently used as exactly that, the following
 // is guarunteed to continue working as it does
 let add = bitmap1 + 10;
