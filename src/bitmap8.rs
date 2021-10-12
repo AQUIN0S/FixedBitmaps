@@ -2,26 +2,25 @@ use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
+    mem,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
-const MAP_LENGTH: u64 = 8;
+const MAP_LENGTH: u64 = (mem::size_of::<u8>() * 8) as u64;
 
-/// The smallest denomination of bitmap in this crate. This is simply a byte-long bitmap,
-/// useful for when only a few flags would be defined.
+/// A bitmap of length 8.
 ///
 /// # Examples
 /// ```rust
+/// // Creates an empty bitmap
 /// use fixed_bitmaps::Bitmap8;
 ///
-/// // Creates an empty bitmap
 /// let mut bitmap = Bitmap8::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
-/// // Will show 00000000
 /// println!("Default bitmap: {}", bitmap);
 ///
 /// // Bitmaps also convert to their respective unsigned int versions and back again easily
@@ -31,7 +30,6 @@ const MAP_LENGTH: u64 = 8;
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= Bitmap8::from(101);
 ///
-/// // Will show 01100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
 /// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
@@ -47,22 +45,31 @@ const MAP_LENGTH: u64 = 8;
 pub struct Bitmap8(u8);
 
 impl Bitmap8 {
+    pub fn capacity() -> u64 {
+        MAP_LENGTH
+    }
+
     pub fn to_u8(&self) -> u8 {
         self.0
     }
 
-    /// Creates a new, empty `Bitmap8`, and sets the desired index before returning. The least significant bit is at index 0.
+    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning.
     ///
-    /// ## Example
+    /// When calling:
     ///
     /// ```rust
     /// use fixed_bitmaps::Bitmap8;
     ///
-    /// let a = Bitmap8::from_set(2).unwrap();
-    /// // The above is equivalent to:
-    /// let b = Bitmap8::from(0b100);
+    /// let mut bitmap = Bitmap8::from_set(5);
+    /// ```
     ///
-    /// assert!(a == b);
+    /// This is equivalent to:
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap8;
+    ///
+    /// let mut bitmap = Bitmap8::from(0);
+    /// bitmap.set(5, true);
     /// ```
     pub fn from_set(index: u64) -> Option<Bitmap8> {
         if index >= MAP_LENGTH {
@@ -110,12 +117,6 @@ impl Bitmap8 {
     }
 }
 
-impl From<u8> for Bitmap8 {
-    fn from(value: u8) -> Self {
-        Bitmap8(value)
-    }
-}
-
 impl Display for Bitmap8 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         let mut bitmap = String::new();
@@ -123,6 +124,12 @@ impl Display for Bitmap8 {
             bitmap.push_str(&(if self.0 & (1 << i) > 0 { 1 } else { 0 }).to_string());
         }
         write!(f, "{}", bitmap.chars().rev().collect::<String>())
+    }
+}
+
+impl From<u8> for Bitmap8 {
+    fn from(value: u8) -> Self {
+        Bitmap8(value)
     }
 }
 
@@ -272,7 +279,7 @@ impl BitXorAssign<u8> for Bitmap8 {
     }
 }
 
-// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+// Traits implementing arithmetic operations between Bitmaps and their respective integer types.
 
 impl Add<u8> for Bitmap8 {
     type Output = Self;
@@ -358,5 +365,15 @@ impl Shr<u64> for Bitmap8 {
 impl ShrAssign<u64> for Bitmap8 {
     fn shr_assign(&mut self, rhs: u64) {
         self.0 >>= rhs;
+    }
+}
+
+// The Not trait, flipping 1's to 0's and 0's to 1's
+
+impl Not for Bitmap8 {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        Self(self.0 ^ u8::MAX)
     }
 }

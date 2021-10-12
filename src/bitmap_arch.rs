@@ -5,14 +5,13 @@ use std::{
     mem,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
-const MAP_LENGTH: u64 = (mem::size_of::<usize>() as u64) * 8;
+const MAP_LENGTH: u64 = (mem::size_of::<usize>() * 8) as u64;
 
-/// A bitmap whose size depends on the architecture of the target computer it's running on. For example on a 64-bit target, this bitmap would be 8 bytes long,
-/// whereas on a 32-bit target, it would hold 4 bytes of data.
+/// A bitmap of length usize.
 ///
 /// # Examples
 /// ```rust
@@ -22,7 +21,6 @@ const MAP_LENGTH: u64 = (mem::size_of::<usize>() as u64) * 8;
 /// let mut bitmap = BitmapArch::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
-/// // Will show 32 0's on a 32-bit architecture, and 64 on a 64-bit architecture
 /// println!("Default bitmap: {}", bitmap);
 ///
 /// // Bitmaps also convert to their respective unsigned int versions and back again easily
@@ -32,11 +30,10 @@ const MAP_LENGTH: u64 = (mem::size_of::<usize>() as u64) * 8;
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= BitmapArch::from(101);
 ///
-/// // Will show ...1100101, where ... represents some number of padding 0's that depends on the architecture of the target
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
 /// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
-/// //as we know for certain that 4 < 32
+/// //as we know for certain that 4 < usize
 /// bitmap.set(4, true).unwrap();
 ///
 /// // Will show that 117 (101 + 2^4) is the value of the bitmap
@@ -48,6 +45,10 @@ const MAP_LENGTH: u64 = (mem::size_of::<usize>() as u64) * 8;
 pub struct BitmapArch(usize);
 
 impl BitmapArch {
+    pub fn capacity() -> u64 {
+        MAP_LENGTH
+    }
+
     pub fn to_usize(&self) -> usize {
         self.0
     }
@@ -113,10 +114,6 @@ impl BitmapArch {
 
         let mask = 1 << index;
         Ok(self.0 & mask > 0)
-    }
-
-    pub fn capacity() -> u64 {
-        MAP_LENGTH
     }
 }
 
@@ -282,7 +279,7 @@ impl BitXorAssign<usize> for BitmapArch {
     }
 }
 
-// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+// Traits implementing arithmetic operations between Bitmaps and their respective integer types.
 
 impl Add<usize> for BitmapArch {
     type Output = Self;
@@ -337,5 +334,46 @@ impl Div<usize> for BitmapArch {
 impl DivAssign<usize> for BitmapArch {
     fn div_assign(&mut self, rhs: usize) {
         self.0 /= rhs;
+    }
+}
+
+// Traits for left and right bitwise shifts. These really only make sense when working
+// with integers, rather than other bitmaps
+
+impl Shl<u64> for BitmapArch {
+    type Output = Self;
+
+    fn shl(self, rhs: u64) -> Self::Output {
+        Self(self.0 << rhs)
+    }
+}
+
+impl ShlAssign<u64> for BitmapArch {
+    fn shl_assign(&mut self, rhs: u64) {
+        self.0 <<= rhs;
+    }
+}
+
+impl Shr<u64> for BitmapArch {
+    type Output = Self;
+
+    fn shr(self, rhs: u64) -> Self::Output {
+        Self(self.0 >> rhs)
+    }
+}
+
+impl ShrAssign<u64> for BitmapArch {
+    fn shr_assign(&mut self, rhs: u64) {
+        self.0 >>= rhs;
+    }
+}
+
+// The Not trait, flipping 1's to 0's and 0's to 1's
+
+impl Not for BitmapArch {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        Self(self.0 ^ usize::MAX)
     }
 }

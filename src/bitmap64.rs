@@ -2,36 +2,34 @@ use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
+    mem,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
-const MAP_LENGTH: u64 = 64;
+const MAP_LENGTH: u64 = (mem::size_of::<u64>() * 8) as u64;
 
-/// A bitmap of length 64. This would be the fastest bitmap to use on 64-bit architectures.
+/// A bitmap of length 64.
 ///
 /// # Examples
 /// ```rust
+/// // Creates an empty bitmap
 /// use fixed_bitmaps::Bitmap64;
 ///
-/// // Creates an empty bitmap
 /// let mut bitmap = Bitmap64::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
-/// // Will show 0000000000000000000000000000000000000000000000000000000000000000
 /// println!("Default bitmap: {}", bitmap);
 ///
 /// // Bitmaps also convert to their respective unsigned int versions and back again easily
 /// // Will show 0 as the value of the bitmap
 /// println!("Value of bitmap: {}", bitmap.to_u64());
 ///
-///
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= Bitmap64::from(101);
 ///
-/// // Will show 0000000000000000000000000000000000000000000000000000000001100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
 /// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
@@ -47,22 +45,31 @@ const MAP_LENGTH: u64 = 64;
 pub struct Bitmap64(u64);
 
 impl Bitmap64 {
+    pub fn capacity() -> u64 {
+        MAP_LENGTH
+    }
+
     pub fn to_u64(&self) -> u64 {
         self.0
     }
 
-    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning. The least significant bit is at index 0.
+    /// Creates a new, empty `Bitmap64`, and sets the desired index before returning.
     ///
-    /// ## Example
+    /// When calling:
     ///
     /// ```rust
     /// use fixed_bitmaps::Bitmap64;
     ///
-    /// let a = Bitmap64::from_set(2).unwrap();
-    /// // The above is equivalent to:
-    /// let b = Bitmap64::from(0b100);
+    /// let mut bitmap = Bitmap64::from_set(5);
+    /// ```
     ///
-    /// assert!(a == b);
+    /// This is equivalent to:
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap64;
+    ///
+    /// let mut bitmap = Bitmap64::from(0);
+    /// bitmap.set(5, true);
     /// ```
     pub fn from_set(index: u64) -> Option<Bitmap64> {
         if index >= MAP_LENGTH {
@@ -110,12 +117,6 @@ impl Bitmap64 {
     }
 }
 
-impl From<u64> for Bitmap64 {
-    fn from(value: u64) -> Self {
-        Bitmap64(value)
-    }
-}
-
 impl Display for Bitmap64 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         let mut bitmap = String::new();
@@ -123,6 +124,12 @@ impl Display for Bitmap64 {
             bitmap.push_str(&(if self.0 & (1 << i) > 0 { 1 } else { 0 }).to_string());
         }
         write!(f, "{}", bitmap.chars().rev().collect::<String>())
+    }
+}
+
+impl From<u64> for Bitmap64 {
+    fn from(value: u64) -> Self {
+        Bitmap64(value)
     }
 }
 
@@ -272,7 +279,7 @@ impl BitXorAssign<u64> for Bitmap64 {
     }
 }
 
-// Traits implementing bitwise operations between Bitmaps and their respective integer types.
+// Traits implementing arithmetic operations between Bitmaps and their respective integer types.
 
 impl Add<u64> for Bitmap64 {
     type Output = Self;
@@ -358,5 +365,15 @@ impl Shr<u64> for Bitmap64 {
 impl ShrAssign<u64> for Bitmap64 {
     fn shr_assign(&mut self, rhs: u64) {
         self.0 >>= rhs;
+    }
+}
+
+// The Not trait, flipping 1's to 0's and 0's to 1's
+
+impl Not for Bitmap64 {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        Self(self.0 ^ u64::MAX)
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "fixed_bitmaps"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2018"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/fixed_bitmaps"
@@ -15,3 +15,11 @@ serde = { version = "1.0", features = ["derive"] }
 
 [lib]
 path="src/lib.rs"
+
+[[bin]]
+path="src/bin/create_variants.rs"
+name="create_variants"
+
+[[bin]]
+name="create_tests"
+path="src/bin/create_tests.rs"

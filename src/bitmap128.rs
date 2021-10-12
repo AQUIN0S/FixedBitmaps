@@ -2,13 +2,14 @@ use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::Display,
+    mem,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+        DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
 
-const MAP_LENGTH: u64 = 128;
+const MAP_LENGTH: u64 = (mem::size_of::<u128>() * 8) as u64;
 
 /// A bitmap of length 128.
 ///
@@ -20,7 +21,6 @@ const MAP_LENGTH: u64 = 128;
 /// let mut bitmap = Bitmap128::default();
 ///
 /// // Bitmaps implement Display so you can view what the map looks like
-/// // Will show 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 /// println!("Default bitmap: {}", bitmap);
 ///
 /// // Bitmaps also convert to their respective unsigned int versions and back again easily
@@ -30,7 +30,6 @@ const MAP_LENGTH: u64 = 128;
 /// // Let's do the same as above, but actually setting the values in the bitmap to something
 /// bitmap |= Bitmap128::from(101);
 ///
-/// // Will show 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001100101
 /// println!("Bitmap after OR-ing with 101: {}", bitmap);
 ///
 /// // Set the 4th index (the 5th bit) to true. Can simply unwrap the result to ignore the warning,
@@ -46,6 +45,10 @@ const MAP_LENGTH: u64 = 128;
 pub struct Bitmap128(u128);
 
 impl Bitmap128 {
+    pub fn capacity() -> u64 {
+        MAP_LENGTH
+    }
+
     pub fn to_u128(&self) -> u128 {
         self.0
     }
@@ -362,5 +365,15 @@ impl Shr<u64> for Bitmap128 {
 impl ShrAssign<u64> for Bitmap128 {
     fn shr_assign(&mut self, rhs: u64) {
         self.0 >>= rhs;
+    }
+}
+
+// The Not trait, flipping 1's to 0's and 0's to 1's
+
+impl Not for Bitmap128 {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        Self(self.0 ^ u128::MAX)
     }
 }
