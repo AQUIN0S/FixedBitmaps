@@ -6,9 +6,11 @@
 [![Downloads](https://img.shields.io/crates/d/fixed_bitmaps)](https://crates.io/crates/fixed_bitmaps)
 [![License](https://img.shields.io/crates/l/fixed_bitmaps)](https://opensource.org/licenses)
 
-Implement bitmap functionality around primitive Rust unsigned integers. I ended up making this after wanting a simple data structure to use for bit flags. Other options definitely exist such as `bitmap` and `bitmaps`, but they looked intimidating, and besides, I just wanted to make a crate I was willing to publish!
+Implement bitmap functionality around primitive Rust unsigned integers. I ended up making this after wanting a simple data structure to use for bit flags. Other options definitely exist, but some looked intimidating and others I didn't find till after I made this, and besides, I just wanted to make a crate I was willing to publish!
 
-These bitmaps are simply for when you want a data structure to hold boolean flags, which can be AND-ed, OR-ed and XOR-ed together, in as compressed a format as possible, while still holding enough functionality to easily view the bitmap for display, or get a particular bit.
+These bitmaps are simply for when you want a data structure to hold boolean flags, which can be AND-ed, OR-ed and XOR-ed together, in as compressed a format as possible, while still holding enough functionality to easily view the bitmap for display, or get a particular bit. Working with this crate is a breeze, and if you want a relatively small dependency that's stable and easy to use, this could be the one for you!
+
+One thing this crate is not is *flexible*! The largest bitmaps you can make with this are 128 bits long, so if you want something larger, you may wish to visit other crates that implement this. The one that I would recommend, which this crate turned out to become very similar to, is [bit-vec](https://crates.io/crates/bit-vec).
 
 ## Features
 
