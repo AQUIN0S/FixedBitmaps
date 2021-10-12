@@ -99,12 +99,48 @@ fn xor_functionality() {
 fn not_functionality() {
     let a = Bitmap32::default();
     let b = Bitmap32::from(u32::MAX);
-    let c = Bitmap32::from(0b10101010);
+    let c = Bitmap32::from(0b1010);
 
     assert_eq!(!a, b);
     assert_eq!(!b, a);
 
-    // !c is actually 1111111...01010101
-    assert_ne!(!c, Bitmap32::from(0b01010101));
-    assert_eq!(!c, Bitmap32::from(u32::MAX - 0b10101010));
+    // !c is actually 1111...0101
+    assert_ne!(!c, Bitmap32::from(0b0101));
+    assert_eq!(!c, Bitmap32::from(u32::MAX - 0b1010));
+}
+
+#[test]
+#[should_panic]
+fn add_over_limit() {
+    let mut bitmap = Bitmap32::from(u32::MAX);
+    bitmap += 1;
+}
+
+#[test]
+#[should_panic]
+fn subtract_to_negative() {
+    let mut bitmap = Bitmap32::default();
+    bitmap -= 1;
+}
+
+#[test]
+#[should_panic]
+fn divide_by_0() {
+    let mut bitmap = Bitmap32::from(1);
+    bitmap /= 0;
+}
+
+#[test]
+#[should_panic]
+fn multiply_over_limit() {
+    let mut bitmap = Bitmap32::from(u32::MAX);
+    bitmap *= 2;
+}
+
+#[test]
+fn deref_works() {
+    let mut bitmap = Bitmap32::from(1);
+    bitmap.set(4, true).unwrap();
+    let value = *bitmap;
+    assert_eq!(value, 17);
 }

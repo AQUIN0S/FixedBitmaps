@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
     mem,
     ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Deref, Div,
         DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
@@ -38,6 +38,9 @@ const MAP_LENGTH: u64 = (mem::size_of::<u64>() * 8) as u64;
 ///
 /// // Will show that 117 (101 + 2^4) is the value of the bitmap
 /// println!("Bitmap value: {}", bitmap.to_u64());
+///
+/// // Or you could use the deref operator for an even easier conversion
+/// println!("Bitmap value: {}", *bitmap);
 /// ```
 #[derive(
     PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,
@@ -55,21 +58,17 @@ impl Bitmap64 {
 
     /// Creates a new, empty `Bitmap64`, and sets the desired index before returning.
     ///
-    /// When calling:
-    ///
     /// ```rust
     /// use fixed_bitmaps::Bitmap64;
     ///
-    /// let mut bitmap = Bitmap64::from_set(5);
-    /// ```
+    /// let a = Bitmap64::from_set(5).unwrap();
     ///
-    /// This is equivalent to:
+    /// // The above is equivalent to:
     ///
-    /// ```rust
-    /// use fixed_bitmaps::Bitmap64;
+    /// let mut b = Bitmap64::from(0);
+    /// b.set(5, true);
     ///
-    /// let mut bitmap = Bitmap64::from(0);
-    /// bitmap.set(5, true);
+    /// assert_eq!(a, b);
     /// ```
     pub fn from_set(index: u64) -> Option<Bitmap64> {
         if index >= MAP_LENGTH {
@@ -81,6 +80,26 @@ impl Bitmap64 {
         Some(bitmap)
     }
 
+    /// Sets the desired index, to the value provided. Note that indexing starts
+    /// at 0.
+    ///
+    /// ## Returns
+    ///
+    /// Returns a `Result` based on the outcome. If an `Err<String>` was returned,
+    /// it was because an out-of-bounds index was attempted to be set. In that
+    /// case the bitmap's state remains unchanged.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap64;
+    ///
+    /// let mut bitmap = Bitmap64::default();
+    /// assert_eq!(*bitmap, 0);
+    ///
+    /// bitmap.set(4, true);
+    /// assert_eq!(*bitmap, 16);
+    /// ```
     pub fn set(&mut self, index: u64, value: bool) -> Result<(), String> {
         if index >= MAP_LENGTH {
             return Err(String::from(
@@ -102,6 +121,27 @@ impl Bitmap64 {
         Ok(())
     }
 
+    /// Gets the bit at the given index. Note that indexing starts at 0.
+    ///
+    /// ## Returns
+    ///
+    /// Returns a `Result` based on the outcome.
+    ///
+    /// If `Ok<bool>` is returned, then the contained value in ok is the state
+    /// of the given bit
+    ///
+    /// If an `Err<String>` was returned, it was because you tried to get
+    /// an out-of-bounds index.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap64;
+    ///
+    /// let bitmap = Bitmap64::from(0b1010);
+    /// assert_eq!(bitmap.get(2).unwrap(), false);
+    /// assert_eq!(bitmap.get(3).unwrap(), true);
+    /// ```
     pub fn get(&self, index: u64) -> Result<bool, String> {
         if index >= MAP_LENGTH {
             return Err(String::from(
@@ -375,5 +415,15 @@ impl Not for Bitmap64 {
 
     fn not(self) -> Self::Output {
         Self(self.0 ^ u64::MAX)
+    }
+}
+
+// Dereference
+
+impl Deref for Bitmap64 {
+    type Target = u64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
