@@ -22,13 +22,13 @@
 
 use std::{fs, path::PathBuf, str};
 
-const REPLACE_PRIMITIVES: (&str, &str, &str, &str) = ("u8", "Bitmap8", "8", "bitmap8");
+const REPLACE_PRIMITIVES: (&str, &str, &str, &str) = ("u128", "Bitmap128", "128", "bitmap128");
 
 const WITH_PRIMITIVES: [(&str, &str, &str, &str); 5] = [
     ("u64", "64", "64", "bitmap64"),
     ("u32", "32", "32", "bitmap32"),
     ("u16", "16", "16", "bitmap16"),
-    ("u128", "128", "128", "bitmap128"),
+    ("u8", "8", "8", "bitmap8"),
     ("usize", "Arch", "usize", "bitmap_arch"),
 ];
 
