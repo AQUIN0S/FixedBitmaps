@@ -11,7 +11,7 @@
 //! - The other option was to find a way to make it so that changes in one file could propogate automatically to all of the other
 //!   modules. This is the method I chose, hence this binary.
 //!
-//! This program currently focusses on two files: `fixed_bitmaps/src/bitmap8.rs` and `fixed_bitmaps/tests/test_bitmap8.rs`.
+//! This program currently focusses on two files: `fixed_bitmaps/src/primitives/bitmap128.rs` and `fixed_bitmaps/tests/primitives/bitmap128.rs`.
 //! When benchmarking becomes a thing I'll probably add in a file there too.
 //!
 //! All it does is when run, it takes the contents of the above two files, and overwrites or creates 5 more files each, one
