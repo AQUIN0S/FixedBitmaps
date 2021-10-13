@@ -13,6 +13,15 @@ fn max_works_fine() {
 }
 
 #[test]
+fn copy_test() {
+    let a = Bitmap32::from(45);
+    let mut b = a;
+    b += 1;
+
+    assert_ne!(a, b);
+}
+
+#[test]
 fn equality_test() {
     let a = Bitmap32::from(24);
     let b = Bitmap32::from(24);

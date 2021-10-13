@@ -11,7 +11,7 @@
 //! - The other option was to find a way to make it so that changes in one file could propogate automatically to all of the other
 //!   modules. This is the method I chose, hence this binary.
 //!
-//! This program currently focusses on two files: `fixed_bitmaps/src/bitmap128.rs` and `fixed_bitmaps/tests/test_bitmap128.rs`.
+//! This program currently focusses on two files: `fixed_bitmaps/src/bitmap8.rs` and `fixed_bitmaps/tests/test_bitmap8.rs`.
 //! When benchmarking becomes a thing I'll probably add in a file there too.
 //!
 //! All it does is when run, it takes the contents of the above two files, and overwrites or creates 5 more files each, one
@@ -22,36 +22,33 @@
 
 use std::{fs, path::PathBuf, str};
 
-const REPLACE: (&str, &str, &str, &str) = ("u128", "Bitmap128", "128", "bitmap128");
+const REPLACE_PRIMITIVES: (&str, &str, &str, &str) = ("u8", "Bitmap8", "8", "bitmap8");
 
-const WITH: [(&str, &str, &str, &str); 5] = [
+const WITH_PRIMITIVES: [(&str, &str, &str, &str); 5] = [
     ("u64", "64", "64", "bitmap64"),
     ("u32", "32", "32", "bitmap32"),
     ("u16", "16", "16", "bitmap16"),
-    ("u8", "8", "8", "bitmap8"),
+    ("u128", "128", "128", "bitmap128"),
     ("usize", "Arch", "usize", "bitmap_arch"),
 ];
 
-fn create_or_replace_tests() {
-    let src_dir_path = String::from("./tests/");
+fn create_or_replace(
+    src_dir_path: String,
+    replace: (&str, &str, &str, &str),
+    with: Vec<(&str, &str, &str, &str)>,
+) {
+    let original = fs::read_to_string(String::from(&src_dir_path) + replace.3 + ".rs").unwrap();
 
-    let original =
-        fs::read_to_string(String::from(&src_dir_path) + "test_" + REPLACE.3 + ".rs").unwrap();
-
-    for write_values in WITH {
-        let path: PathBuf = [
-            ".",
-            &src_dir_path,
-            &(String::from("test_") + write_values.3 + ".rs"),
-        ]
-        .iter()
-        .collect();
+    for write_values in with {
+        let path: PathBuf = [".", &src_dir_path, &(String::from(write_values.3) + ".rs")]
+            .iter()
+            .collect();
 
         let path = path.as_path();
 
-        let mut new_content = String::from(&original).replace(REPLACE.0, write_values.0);
-        new_content = new_content.replace(REPLACE.1, &(String::from("Bitmap") + write_values.1));
-        new_content = new_content.replace(REPLACE.2, write_values.2);
+        let mut new_content = String::from(&original).replace(replace.0, write_values.0);
+        new_content = new_content.replace(replace.1, &(String::from("Bitmap") + write_values.1));
+        new_content = new_content.replace(replace.2, write_values.2);
 
         match fs::write(path, new_content) {
             Ok(_) => {}
@@ -64,31 +61,20 @@ fn create_or_replace_tests() {
     }
 }
 
+fn create_or_replace_tests() {
+    create_or_replace(
+        String::from("./tests/primitives/"),
+        REPLACE_PRIMITIVES,
+        Vec::from(WITH_PRIMITIVES),
+    );
+}
+
 fn create_or_replace_modules() {
-    let src_dir_path = String::from("./src/");
-
-    let original = fs::read_to_string(String::from(&src_dir_path) + REPLACE.3 + ".rs").unwrap();
-
-    for write_values in WITH {
-        let path: PathBuf = [".", &src_dir_path, &(String::from(write_values.3) + ".rs")]
-            .iter()
-            .collect();
-
-        let path = path.as_path();
-
-        let mut new_content = String::from(&original).replace(REPLACE.0, write_values.0);
-        new_content = new_content.replace(REPLACE.1, &(String::from("Bitmap") + write_values.1));
-        new_content = new_content.replace(REPLACE.2, write_values.2);
-
-        match fs::write(path, new_content) {
-            Ok(_) => {}
-            Err(error) => {
-                eprintln!("Could not write to file!");
-                eprintln!("File path: {}", path.to_str().unwrap());
-                eprintln!("Caused by: {}", error);
-            }
-        }
-    }
+    create_or_replace(
+        String::from("./src/primitives/"),
+        REPLACE_PRIMITIVES,
+        Vec::from(WITH_PRIMITIVES),
+    );
 }
 
 fn main() {

@@ -34,8 +34,8 @@
 //!
 //! When making changes, only do so in the following two files (unless of course you plan to add a new module or something of the sort):
 //!
-//! - `fixed_bitmaps/src/bitmap128.rs`
-//! - `fixed_bitmaps/tests/test_bitmap128.rs`
+//! - `fixed_bitmaps/src/primitives/bitmap8.rs`
+//! - `fixed_bitmaps/tests/primitives/test_bitmap8.rs`
 //!
 //! You can then run `cargo run` on this project, and it will propogate changes to those files through to all of the other files in their
 //! respective directories, adapting the changes to match the particular primitive each module aims to support.
@@ -99,16 +99,13 @@
 //! Note that all of the various `Bitmap` types are exactly the same in
 //! the operations they can perform, the only difference is the integer type they wrap.
 
-mod bitmap128;
-mod bitmap16;
-mod bitmap32;
-mod bitmap64;
-mod bitmap8;
-mod bitmap_arch;
+mod oversized;
+mod primitives;
 
-pub use bitmap128::Bitmap128;
-pub use bitmap16::Bitmap16;
-pub use bitmap32::Bitmap32;
-pub use bitmap64::Bitmap64;
-pub use bitmap8::Bitmap8;
-pub use bitmap_arch::BitmapArch;
+pub use oversized::BitmapKB;
+pub use primitives::Bitmap128;
+pub use primitives::Bitmap16;
+pub use primitives::Bitmap32;
+pub use primitives::Bitmap64;
+pub use primitives::Bitmap8;
+pub use primitives::BitmapArch;

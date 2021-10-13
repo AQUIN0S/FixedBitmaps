@@ -92,8 +92,8 @@ Contributions are always welcome, whether for better documentation, bugfixing or
 
 When making changes, only do so in the following two files (unless of course you plan to add a new module or something of the sort):
 
-- `fixed_bitmaps/src/bitmap128.rs`
-- `fixed_bitmaps/tests/test_bitmap128.rs`
+- `fixed_bitmaps/src/primitives/bitmap8.rs`
+- `fixed_bitmaps/tests/primitives/test_bitmap8.rs`
 
 You can then run `cargo run` on this project, and it will propogate changes to those files through to all of the other files in their
 respective directories, adapting the changes to match the particular primitive each module aims to support.
