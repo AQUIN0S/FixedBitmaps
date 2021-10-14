@@ -314,7 +314,7 @@ mod tests {
     #[test]
     fn constants_correct() {
         assert_eq!(ELEMENT_SIZE, size_of::<usize>() * 8);
-        assert_eq!(TOTAL_BITS, 8192);
+        assert_eq!(TOTAL_BITS, 1_024);
         assert_eq!(ELEMENT_COUNT, (TOTAL_BITS / ELEMENT_SIZE as u64) as usize);
     }
 }
