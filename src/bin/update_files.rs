@@ -32,6 +32,15 @@ const WITH_PRIMITIVES: [(&str, &str, &str, &str); 5] = [
     ("usize", "Arch", "usize", "bitmap_arch"),
 ];
 
+const REPLACE_OVERSIZED: (&str, &str, &str, &str) = ("8_192", "BitmapKB", "bitmap_kb", "bitmap_kb");
+
+const WITH_OVERSIZED: [(&str, &str, &str, &str); 4] = [
+    ("256", "256", "bitmap_256", "bitmap_256"),
+    ("512", "512", "bitmap_512", "bitmap_512"),
+    ("1_024", "1024", "bitmap_1024", "bitmap_1024"),
+    ("2_048", "2048", "bitmap_2048", "bitmap_2048"),
+];
+
 fn create_or_replace(
     src_dir_path: String,
     replace: (&str, &str, &str, &str),
@@ -69,7 +78,7 @@ fn create_or_replace_tests() {
     );
 }
 
-fn create_or_replace_modules() {
+fn create_or_replace_primitive_modules() {
     create_or_replace(
         String::from("./src/primitives/"),
         REPLACE_PRIMITIVES,
@@ -77,7 +86,16 @@ fn create_or_replace_modules() {
     );
 }
 
+fn create_or_replace_oversized_modules() {
+    create_or_replace(
+        String::from("./src/oversized/"),
+        REPLACE_OVERSIZED,
+        Vec::from(WITH_OVERSIZED),
+    );
+}
+
 fn main() {
     create_or_replace_tests();
-    create_or_replace_modules();
+    create_or_replace_primitive_modules();
+    create_or_replace_oversized_modules();
 }

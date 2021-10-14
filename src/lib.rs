@@ -102,6 +102,10 @@
 mod oversized;
 mod primitives;
 
+pub use oversized::Bitmap1024;
+pub use oversized::Bitmap2048;
+pub use oversized::Bitmap256;
+pub use oversized::Bitmap512;
 pub use oversized::BitmapKB;
 pub use primitives::Bitmap128;
 pub use primitives::Bitmap16;

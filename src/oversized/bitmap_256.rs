@@ -6,21 +6,21 @@ use std::{
 };
 
 const ELEMENT_SIZE: usize = mem::size_of::<usize>() * 8;
-const TOTAL_BITS: u64 = 8_192;
+const TOTAL_BITS: u64 = 256;
 const ELEMENT_COUNT: usize = (TOTAL_BITS / ELEMENT_SIZE as u64) as usize;
 
-/// Experimental struct for now, a bitmap containing 8_192 bits.
+/// Experimental struct for now, a bitmap containing 256 bits.
 /// I wouldn't yet recommend using this struct until it's more stable!
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug)]
-pub struct BitmapKB([usize; ELEMENT_COUNT]);
+pub struct Bitmap256([usize; ELEMENT_COUNT]);
 
-impl Default for BitmapKB {
+impl Default for Bitmap256 {
     fn default() -> Self {
         Self([0; ELEMENT_COUNT])
     }
 }
 
-impl BitmapKB {
+impl Bitmap256 {
     fn get_element_location(bit_index: u64) -> usize {
         ELEMENT_COUNT - 1 - (bit_index / ELEMENT_SIZE as u64) as usize
     }
@@ -43,7 +43,7 @@ impl BitmapKB {
                 + ")");
         }
 
-        let element_location = BitmapKB::get_element_location(index);
+        let element_location = Bitmap256::get_element_location(index);
         let mask = 1 << index % ELEMENT_SIZE as u64;
         Ok(self.0[element_location] & mask > 0)
     }
@@ -58,7 +58,7 @@ impl BitmapKB {
                 + ")");
         }
 
-        let element_location = BitmapKB::get_element_location(index);
+        let element_location = Bitmap256::get_element_location(index);
 
         if value {
             let mask = 1 << index % ELEMENT_SIZE as u64;
@@ -71,18 +71,18 @@ impl BitmapKB {
         Ok(())
     }
 
-    pub fn from_set(index: u64) -> Option<BitmapKB> {
+    pub fn from_set(index: u64) -> Option<Bitmap256> {
         if index >= TOTAL_BITS {
             return None;
         }
 
-        let mut bitmap = BitmapKB::default();
+        let mut bitmap = Bitmap256::default();
         bitmap.set(index, true).unwrap();
         Some(bitmap)
     }
 }
 
-impl Display for BitmapKB {
+impl Display for Bitmap256 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         let mut bitmap = String::new();
         for i in 0..ELEMENT_COUNT {
@@ -95,15 +95,15 @@ impl Display for BitmapKB {
     }
 }
 
-impl From<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl From<[usize; ELEMENT_COUNT]> for Bitmap256 {
     fn from(value: [usize; ELEMENT_COUNT]) -> Self {
-        BitmapKB(value)
+        Bitmap256(value)
     }
 }
 
 // Traits implementing bitwise operations between Bitmaps of the same type
 
-impl BitAnd for BitmapKB {
+impl BitAnd for Bitmap256 {
     type Output = Self;
 
     fn bitand(self, rhs: Self) -> Self::Output {
@@ -115,7 +115,7 @@ impl BitAnd for BitmapKB {
     }
 }
 
-impl BitAndAssign for BitmapKB {
+impl BitAndAssign for Bitmap256 {
     fn bitand_assign(&mut self, rhs: Self) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] &= rhs.0[i];
@@ -123,7 +123,7 @@ impl BitAndAssign for BitmapKB {
     }
 }
 
-impl BitOr for BitmapKB {
+impl BitOr for Bitmap256 {
     type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
@@ -135,7 +135,7 @@ impl BitOr for BitmapKB {
     }
 }
 
-impl BitOrAssign for BitmapKB {
+impl BitOrAssign for Bitmap256 {
     fn bitor_assign(&mut self, rhs: Self) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] |= rhs.0[i];
@@ -143,7 +143,7 @@ impl BitOrAssign for BitmapKB {
     }
 }
 
-impl BitXor for BitmapKB {
+impl BitXor for Bitmap256 {
     type Output = Self;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
@@ -155,7 +155,7 @@ impl BitXor for BitmapKB {
     }
 }
 
-impl BitXorAssign for BitmapKB {
+impl BitXorAssign for Bitmap256 {
     fn bitxor_assign(&mut self, rhs: Self) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] ^= rhs.0[i];
@@ -165,7 +165,7 @@ impl BitXorAssign for BitmapKB {
 
 // Traits implementing bitwise operations between Bitmaps of the same type
 
-impl BitAnd<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitAnd<[usize; ELEMENT_COUNT]> for Bitmap256 {
     type Output = Self;
 
     fn bitand(self, rhs: [usize; ELEMENT_COUNT]) -> Self::Output {
@@ -177,7 +177,7 @@ impl BitAnd<[usize; ELEMENT_COUNT]> for BitmapKB {
     }
 }
 
-impl BitAndAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitAndAssign<[usize; ELEMENT_COUNT]> for Bitmap256 {
     fn bitand_assign(&mut self, rhs: [usize; ELEMENT_COUNT]) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] &= rhs[i];
@@ -185,7 +185,7 @@ impl BitAndAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
     }
 }
 
-impl BitOr<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitOr<[usize; ELEMENT_COUNT]> for Bitmap256 {
     type Output = Self;
 
     fn bitor(self, rhs: [usize; ELEMENT_COUNT]) -> Self::Output {
@@ -197,7 +197,7 @@ impl BitOr<[usize; ELEMENT_COUNT]> for BitmapKB {
     }
 }
 
-impl BitOrAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitOrAssign<[usize; ELEMENT_COUNT]> for Bitmap256 {
     fn bitor_assign(&mut self, rhs: [usize; ELEMENT_COUNT]) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] |= rhs[i];
@@ -205,7 +205,7 @@ impl BitOrAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
     }
 }
 
-impl BitXor<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitXor<[usize; ELEMENT_COUNT]> for Bitmap256 {
     type Output = Self;
 
     fn bitxor(self, rhs: [usize; ELEMENT_COUNT]) -> Self::Output {
@@ -217,7 +217,7 @@ impl BitXor<[usize; ELEMENT_COUNT]> for BitmapKB {
     }
 }
 
-impl BitXorAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
+impl BitXorAssign<[usize; ELEMENT_COUNT]> for Bitmap256 {
     fn bitxor_assign(&mut self, rhs: [usize; ELEMENT_COUNT]) {
         for i in 0..ELEMENT_COUNT {
             self.0[i] ^= rhs[i];
@@ -227,7 +227,7 @@ impl BitXorAssign<[usize; ELEMENT_COUNT]> for BitmapKB {
 
 // Traits implementing arithmetic operations between Bitmaps and their respective integer types.
 
-impl Add<usize> for BitmapKB {
+impl Add<usize> for Bitmap256 {
     type Output = Self;
 
     fn add(self, rhs: usize) -> Self::Output {
@@ -253,7 +253,7 @@ impl Add<usize> for BitmapKB {
     }
 }
 
-impl AddAssign<usize> for BitmapKB {
+impl AddAssign<usize> for Bitmap256 {
     fn add_assign(&mut self, rhs: usize) {
         let mut carry = rhs;
 
@@ -274,7 +274,7 @@ impl AddAssign<usize> for BitmapKB {
     }
 }
 
-impl Deref for BitmapKB {
+impl Deref for Bitmap256 {
     type Target = [usize; ELEMENT_COUNT];
 
     fn deref(&self) -> &Self::Target {
@@ -284,7 +284,7 @@ impl Deref for BitmapKB {
 
 // An attempt at serialization so far, no idea how to implement deserialisation yet
 //
-// impl Serialize for BitmapKB {
+// impl Serialize for Bitmap256 {
 //     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 //     where
 //         S: Serializer,
@@ -300,14 +300,14 @@ impl Deref for BitmapKB {
 #[cfg(test)]
 mod tests {
     use crate::{
-        oversized::bitmap_kb::{ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS},
-        BitmapKB,
+        oversized::bitmap_256::{ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS},
+        Bitmap256,
     };
     use std::mem::size_of;
 
     #[test]
     fn create_default() {
-        let bitmap = BitmapKB::default();
+        let bitmap = Bitmap256::default();
         assert_eq!([0; ELEMENT_COUNT], *bitmap);
     }
 

@@ -9,7 +9,7 @@ use std::{
     },
 };
 
-const MAP_LENGTH: u64 = (mem::size_of::<u32>() * 8) as u64;
+const MAP_LENGTH: usize = mem::size_of::<u32>() * 8;
 
 /// A bitmap of length 32.
 ///
@@ -48,7 +48,7 @@ const MAP_LENGTH: u64 = (mem::size_of::<u32>() * 8) as u64;
 pub struct Bitmap32(u32);
 
 impl Bitmap32 {
-    pub fn capacity() -> u64 {
+    pub fn capacity() -> usize {
         MAP_LENGTH
     }
 
@@ -70,7 +70,7 @@ impl Bitmap32 {
     ///
     /// assert_eq!(a, b);
     /// ```
-    pub fn from_set(index: u64) -> Option<Bitmap32> {
+    pub fn from_set(index: usize) -> Option<Bitmap32> {
         if index >= MAP_LENGTH {
             return None;
         }
@@ -100,7 +100,7 @@ impl Bitmap32 {
     /// bitmap.set(4, true);
     /// assert_eq!(*bitmap, 16);
     /// ```
-    pub fn set(&mut self, index: u64, value: bool) -> Result<(), String> {
+    pub fn set(&mut self, index: usize, value: bool) -> Result<(), String> {
         if index >= MAP_LENGTH {
             return Err(String::from(
                 "Tried to set bit that's out of range of the bitmap (range: ",
@@ -142,7 +142,7 @@ impl Bitmap32 {
     /// assert_eq!(bitmap.get(2).unwrap(), false);
     /// assert_eq!(bitmap.get(3).unwrap(), true);
     /// ```
-    pub fn get(&self, index: u64) -> Result<bool, String> {
+    pub fn get(&self, index: usize) -> Result<bool, String> {
         if index >= MAP_LENGTH {
             return Err(String::from(
                 "Tried to get bit that's out of range of the bitmap (range: ",
@@ -380,30 +380,30 @@ impl DivAssign<u32> for Bitmap32 {
 // Traits for left and right bitwise shifts. These really only make sense when working
 // with integers, rather than other bitmaps
 
-impl Shl<u64> for Bitmap32 {
+impl Shl<usize> for Bitmap32 {
     type Output = Self;
 
-    fn shl(self, rhs: u64) -> Self::Output {
+    fn shl(self, rhs: usize) -> Self::Output {
         Self(self.0 << rhs)
     }
 }
 
-impl ShlAssign<u64> for Bitmap32 {
-    fn shl_assign(&mut self, rhs: u64) {
+impl ShlAssign<usize> for Bitmap32 {
+    fn shl_assign(&mut self, rhs: usize) {
         self.0 <<= rhs;
     }
 }
 
-impl Shr<u64> for Bitmap32 {
+impl Shr<usize> for Bitmap32 {
     type Output = Self;
 
-    fn shr(self, rhs: u64) -> Self::Output {
+    fn shr(self, rhs: usize) -> Self::Output {
         Self(self.0 >> rhs)
     }
 }
 
-impl ShrAssign<u64> for Bitmap32 {
-    fn shr_assign(&mut self, rhs: u64) {
+impl ShrAssign<usize> for Bitmap32 {
+    fn shr_assign(&mut self, rhs: usize) {
         self.0 >>= rhs;
     }
 }

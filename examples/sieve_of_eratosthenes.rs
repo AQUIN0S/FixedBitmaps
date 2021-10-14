@@ -1,12 +1,10 @@
-use fixed_bitmaps::BitmapKB;
+use fixed_bitmaps::Bitmap2048;
 use std::time::Instant;
 
 fn main() {
-    let max = 8_000;
+    let max = 2048;
 
-    let mut bitmap = BitmapKB::from([usize::MAX; 128]);
-    println!("{}", bitmap);
-    println!();
+    let mut bitmap = Bitmap2048::from([usize::MAX; 32]);
 
     let time = Instant::now();
 
@@ -27,9 +25,5 @@ fn main() {
             print!("{}, ", i);
         }
     }
-
-    println!();
-    println!();
-    println!("{}", bitmap);
     println!("Time elapsed: {}", elapsed);
 }
