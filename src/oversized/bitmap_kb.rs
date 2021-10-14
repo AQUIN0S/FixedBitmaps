@@ -5,9 +5,9 @@ use std::{
     ops::{Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Deref},
 };
 
-const ELEMENT_BYTES: usize = mem::size_of::<usize>();
-const ELEMENT_COUNT: usize = 1024 / ELEMENT_BYTES;
-const TOTAL_CAPACITY: u64 = (ELEMENT_COUNT as u64) * 8 * (ELEMENT_BYTES as u64);
+const ELEMENT_SIZE: usize = mem::size_of::<usize>() * 8;
+const TOTAL_BITS: u64 = 8192;
+const ELEMENT_COUNT: usize = (TOTAL_BITS / ELEMENT_SIZE as u64) as usize;
 
 /// Experimental struct for now, a bitmap 1KB long, or containing 8192 bits.
 /// I wouldn't yet recommend using this struct until it's more stable!
@@ -22,32 +22,37 @@ impl Default for BitmapKB {
 
 impl BitmapKB {
     fn get_element_location(bit_index: u64) -> usize {
-        (bit_index / (ELEMENT_BYTES * 8) as u64) as usize
+        ELEMENT_COUNT - 1 - (bit_index / ELEMENT_SIZE as u64) as usize
     }
 
     pub fn capacity() -> u64 {
-        TOTAL_CAPACITY
+        TOTAL_BITS
     }
 
     pub fn to_array(&self) -> [usize; ELEMENT_COUNT] {
         self.0
     }
 
-    pub fn from_set(index: u64) -> Option<BitmapKB> {
-        if index >= TOTAL_CAPACITY {
-            return None;
+    pub fn get(&self, index: u64) -> Result<bool, String> {
+        if index >= TOTAL_BITS {
+            return Err(String::from(
+                "Tried to get bit that's out of range of the bitmap (range: ",
+            ) + &TOTAL_BITS.to_string()
+                + ", index: "
+                + &index.to_string()
+                + ")");
         }
 
-        let mut bitmap = BitmapKB::default();
-        bitmap.set(index, true).unwrap();
-        Some(bitmap)
+        let element_location = BitmapKB::get_element_location(index);
+        let mask = 1 << index % ELEMENT_SIZE as u64;
+        Ok(self.0[element_location] & mask > 0)
     }
 
     pub fn set(&mut self, index: u64, value: bool) -> Result<(), String> {
-        if index >= TOTAL_CAPACITY {
+        if index >= TOTAL_BITS {
             return Err(String::from(
                 "Tried to set bit that's out of range of the bitmap (range: ",
-            ) + &TOTAL_CAPACITY.to_string()
+            ) + &TOTAL_BITS.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -56,29 +61,24 @@ impl BitmapKB {
         let element_location = BitmapKB::get_element_location(index);
 
         if value {
-            let mask = 1 << index % ELEMENT_BYTES as u64;
+            let mask = 1 << index % ELEMENT_SIZE as u64;
             self.0[element_location] |= mask;
         } else {
-            let mask = usize::MAX - (1 << index % ELEMENT_BYTES as u64);
+            let mask = usize::MAX - (1 << index % ELEMENT_SIZE as u64);
             self.0[element_location] &= mask;
         }
 
         Ok(())
     }
 
-    pub fn get(&self, index: u64) -> Result<bool, String> {
-        if index >= TOTAL_CAPACITY {
-            return Err(String::from(
-                "Tried to get bit that's out of range of the bitmap (range: ",
-            ) + &TOTAL_CAPACITY.to_string()
-                + ", index: "
-                + &index.to_string()
-                + ")");
+    pub fn from_set(index: u64) -> Option<BitmapKB> {
+        if index >= TOTAL_BITS {
+            return None;
         }
 
-        let element_location = BitmapKB::get_element_location(index);
-        let mask = 1 << index % ELEMENT_BYTES as u64;
-        Ok(self.0[element_location] & mask > 0)
+        let mut bitmap = BitmapKB::default();
+        bitmap.set(index, true).unwrap();
+        Some(bitmap)
     }
 }
 
@@ -296,3 +296,25 @@ impl Deref for BitmapKB {
 //         seq.end()
 //     }
 // }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        oversized::bitmap_kb::{ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS},
+        BitmapKB,
+    };
+    use std::mem::size_of;
+
+    #[test]
+    fn create_default() {
+        let bitmap = BitmapKB::default();
+        assert_eq!([0; 128], *bitmap);
+    }
+
+    #[test]
+    fn constants_correct() {
+        assert_eq!(ELEMENT_SIZE, size_of::<usize>() * 8);
+        assert_eq!(TOTAL_BITS, 8192);
+        assert_eq!(ELEMENT_COUNT, (TOTAL_BITS / ELEMENT_SIZE as u64) as usize);
+    }
+}
