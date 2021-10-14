@@ -299,11 +299,8 @@ impl Deref for Bitmap4096 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        oversized::bitmap_4096::{ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS},
-        Bitmap4096,
-    };
-    use std::mem::size_of;
+    use super::{Bitmap4096, ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS};
+    use std::mem;
 
     #[test]
     fn create_default() {
@@ -313,7 +310,7 @@ mod tests {
 
     #[test]
     fn constants_correct() {
-        assert_eq!(ELEMENT_SIZE, size_of::<usize>() * 8);
+        assert_eq!(ELEMENT_SIZE, mem::size_of::<usize>() * 8);
         assert_eq!(TOTAL_BITS, 4_096);
         assert_eq!(ELEMENT_COUNT, (TOTAL_BITS / ELEMENT_SIZE as u64) as usize);
     }

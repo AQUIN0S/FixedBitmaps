@@ -299,11 +299,8 @@ impl Deref for Bitmap256 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        oversized::bitmap_256::{ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS},
-        Bitmap256,
-    };
-    use std::mem::size_of;
+    use super::{Bitmap256, ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS};
+    use std::mem;
 
     #[test]
     fn create_default() {
@@ -313,7 +310,7 @@ mod tests {
 
     #[test]
     fn constants_correct() {
-        assert_eq!(ELEMENT_SIZE, size_of::<usize>() * 8);
+        assert_eq!(ELEMENT_SIZE, mem::size_of::<usize>() * 8);
         assert_eq!(TOTAL_BITS, 256);
         assert_eq!(ELEMENT_COUNT, (TOTAL_BITS / ELEMENT_SIZE as u64) as usize);
     }
