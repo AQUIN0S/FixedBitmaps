@@ -34,11 +34,12 @@ const WITH_PRIMITIVES: [(&str, &str, &str, &str); 5] = [
 
 const REPLACE_OVERSIZED: (&str, &str, &str, &str) = ("8_192", "BitmapKB", "bitmap_kb", "bitmap_kb");
 
-const WITH_OVERSIZED: [(&str, &str, &str, &str); 4] = [
+const WITH_OVERSIZED: [(&str, &str, &str, &str); 5] = [
     ("256", "256", "bitmap_256", "bitmap_256"),
     ("512", "512", "bitmap_512", "bitmap_512"),
     ("1_024", "1024", "bitmap_1024", "bitmap_1024"),
     ("2_048", "2048", "bitmap_2048", "bitmap_2048"),
+    ("4_096", "4096", "bitmap_4096", "bitmap_4096"),
 ];
 
 fn create_or_replace(
