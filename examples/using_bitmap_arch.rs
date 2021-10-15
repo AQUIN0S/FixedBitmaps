@@ -15,8 +15,8 @@ fn main() {
     let d = BitmapArch::from(0b1000);
 
     let set1 = a | b | c | d | d;
-    let set2 = a + b + b + c + c + c;
+    let set2 = a | b | c | d;
 
     println!("Set 1: {}", set1);
-    println!("Set 2: {}", set2);
+    println!("Set 2: {:?}", set2);
 }

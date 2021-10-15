@@ -1,4 +1,4 @@
-use fixed_bitmaps::{Bitmap32, ConstantLength};
+use fixed_bitmaps::{Bitmap32, BitmapSize};
 
 #[test]
 fn default_is_0() {

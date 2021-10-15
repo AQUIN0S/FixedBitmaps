@@ -1,8 +1,8 @@
-use super::ConstantLength;
+use super::BitmapSize;
 use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
-    fmt::Display,
+    fmt::{Debug, Display},
     mem,
     ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Deref, Div,
@@ -41,9 +41,7 @@ use std::{
 /// // Or you could use the deref operator for an even easier conversion
 /// println!("Bitmap value: {}", *bitmap);
 /// ```
-#[derive(
-    PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug, Default, Serialize, Deserialize,
-)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Default, Serialize, Deserialize)]
 pub struct Bitmap16(u16);
 
 impl Bitmap16 {
@@ -55,12 +53,38 @@ impl Bitmap16 {
         self.0
     }
 
+    /// Creates a new bitmap with all bits set to the given value.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap16;
+    ///
+    /// let a = Bitmap16::new(true);
+    /// assert_eq!(*a, u16::MAX);
+    ///
+    /// let b = Bitmap16::new(false);
+    /// assert_eq!(*b, 0);
+    /// ```
     pub fn new(value: bool) -> Bitmap16 {
         Bitmap16(if value { u16::MAX } else { 0 })
     }
 
     /// Create a new bitmap that has its bits set from `begin` (inclusive) to `end` (exclusive).
-    /// If begin is greater than the map length or end is 0, will return an empty bitmap.
+    /// If begin is greater than the map length or end is 0, will return a bitmap with all bits set to
+    /// the opposite of value.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap16;
+    ///
+    /// let a = Bitmap16::create_bit_mask(3, 7, true);
+    /// assert_eq!(*a, 0b1111000);
+    ///
+    /// let b = Bitmap16::create_bit_mask(3, 6, false); // Results in 1..1000111
+    /// assert_eq!(b, Bitmap16::new(true) ^ 0b111000);
+    /// ```
     pub fn create_bit_mask(begin: usize, end: usize, value: bool) -> Bitmap16 {
         if value {
             if begin >= Bitmap16::MAP_LENGTH || end < 1 {
@@ -71,17 +95,7 @@ impl Bitmap16 {
                 Bitmap16(u16::MAX << begin & u16::MAX >> Bitmap16::MAP_LENGTH - end)
             }
         } else {
-            if begin >= Bitmap16::MAP_LENGTH || end < 1 {
-                Bitmap16(u16::MAX)
-            } else if begin == 0 && end >= Bitmap16::MAP_LENGTH {
-                Bitmap16(0)
-            } else if end >= Bitmap16::MAP_LENGTH {
-                Bitmap16(u16::MAX >> Bitmap16::MAP_LENGTH - begin)
-            } else if begin < 1 {
-                Bitmap16(u16::MAX << end)
-            } else {
-                Bitmap16(u16::MAX >> Bitmap16::MAP_LENGTH - begin | u16::MAX << end)
-            }
+            !Bitmap16::create_bit_mask(begin, end, true)
         }
     }
 
@@ -150,6 +164,22 @@ impl Bitmap16 {
         Ok(())
     }
 
+    /// Set bits from begin (inclusive) to end (exclusive) to the given value.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use fixed_bitmaps::Bitmap16;
+    ///
+    /// let mut bitmap = Bitmap16::default();
+    /// assert_eq!(*bitmap, 0);
+    ///
+    /// bitmap.set_range(2, 7, true);
+    /// assert_eq!(*bitmap, 0b1111100);
+    ///
+    /// bitmap.set_range(3, 5, false);
+    /// assert_eq!(*bitmap, 0b1100100);
+    /// ```
     pub fn set_range(&mut self, begin: usize, end: usize, value: bool) {
         if value {
             *self |= Bitmap16::create_bit_mask(begin, end, true);
@@ -200,13 +230,19 @@ impl Display for Bitmap16 {
     }
 }
 
+impl Debug for Bitmap16 {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Bitmap16({:X})", self.0)
+    }
+}
+
 impl From<u16> for Bitmap16 {
     fn from(value: u16) -> Self {
         Bitmap16(value)
     }
 }
 
-impl ConstantLength for Bitmap16 {
+impl BitmapSize for Bitmap16 {
     const MAP_LENGTH: usize = mem::size_of::<u16>() * 8;
 }
 

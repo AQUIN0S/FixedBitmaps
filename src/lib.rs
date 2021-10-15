@@ -114,4 +114,4 @@ pub use primitives::Bitmap32;
 pub use primitives::Bitmap64;
 pub use primitives::Bitmap8;
 pub use primitives::BitmapArch;
-pub use primitives::ConstantLength;
+pub use primitives::BitmapSize;

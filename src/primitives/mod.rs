@@ -5,7 +5,7 @@ mod bitmap64;
 mod bitmap8;
 mod bitmap_arch;
 
-pub trait ConstantLength {
+pub trait BitmapSize {
     const MAP_LENGTH: usize;
 }
 

@@ -5,9 +5,10 @@ use std::{
     ops::{Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Deref},
 };
 
+use crate::BitmapSize;
+
 const ELEMENT_SIZE: usize = mem::size_of::<usize>() * 8;
-const TOTAL_BITS: u64 = 1_024;
-const ELEMENT_COUNT: usize = (TOTAL_BITS / ELEMENT_SIZE as u64) as usize;
+const ELEMENT_COUNT: usize = Bitmap1024::MAP_LENGTH / ELEMENT_SIZE;
 
 /// Experimental struct for now, a bitmap containing 1_024 bits.
 /// I wouldn't yet recommend using this struct until it's more stable!
@@ -21,38 +22,38 @@ impl Default for Bitmap1024 {
 }
 
 impl Bitmap1024 {
-    fn get_element_location(bit_index: u64) -> usize {
-        ELEMENT_COUNT - 1 - (bit_index / ELEMENT_SIZE as u64) as usize
+    fn get_element_location(bit_index: usize) -> usize {
+        ELEMENT_COUNT - 1 - bit_index / ELEMENT_SIZE
     }
 
-    pub fn capacity() -> u64 {
-        TOTAL_BITS
+    pub fn capacity() -> usize {
+        Bitmap1024::MAP_LENGTH
     }
 
     pub fn to_array(&self) -> [usize; ELEMENT_COUNT] {
         self.0
     }
 
-    pub fn get(&self, index: u64) -> Result<bool, String> {
-        if index >= TOTAL_BITS {
+    pub fn get(&self, index: usize) -> Result<bool, String> {
+        if index >= Bitmap1024::MAP_LENGTH {
             return Err(String::from(
                 "Tried to get bit that's out of range of the bitmap (range: ",
-            ) + &TOTAL_BITS.to_string()
+            ) + &Bitmap1024::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
         }
 
         let element_location = Bitmap1024::get_element_location(index);
-        let mask = 1 << index % ELEMENT_SIZE as u64;
+        let mask = 1 << index % ELEMENT_SIZE;
         Ok(self.0[element_location] & mask > 0)
     }
 
-    pub fn set(&mut self, index: u64, value: bool) -> Result<(), String> {
-        if index >= TOTAL_BITS {
+    pub fn set(&mut self, index: usize, value: bool) -> Result<(), String> {
+        if index >= Bitmap1024::MAP_LENGTH {
             return Err(String::from(
                 "Tried to set bit that's out of range of the bitmap (range: ",
-            ) + &TOTAL_BITS.to_string()
+            ) + &Bitmap1024::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -61,18 +62,18 @@ impl Bitmap1024 {
         let element_location = Bitmap1024::get_element_location(index);
 
         if value {
-            let mask = 1 << index % ELEMENT_SIZE as u64;
+            let mask = 1 << index % ELEMENT_SIZE;
             self.0[element_location] |= mask;
         } else {
-            let mask = usize::MAX - (1 << index % ELEMENT_SIZE as u64);
+            let mask = usize::MAX - (1 << index % ELEMENT_SIZE);
             self.0[element_location] &= mask;
         }
 
         Ok(())
     }
 
-    pub fn from_set(index: u64) -> Option<Bitmap1024> {
-        if index >= TOTAL_BITS {
+    pub fn from_set(index: usize) -> Option<Bitmap1024> {
+        if index >= Bitmap1024::MAP_LENGTH {
             return None;
         }
 
@@ -93,6 +94,10 @@ impl Display for Bitmap1024 {
         }
         write!(f, "{}", bitmap.chars().collect::<String>())
     }
+}
+
+impl BitmapSize for Bitmap1024 {
+    const MAP_LENGTH: usize = 1_024;
 }
 
 impl From<[usize; ELEMENT_COUNT]> for Bitmap1024 {
@@ -299,7 +304,8 @@ impl Deref for Bitmap1024 {
 
 #[cfg(test)]
 mod tests {
-    use super::{Bitmap1024, ELEMENT_COUNT, ELEMENT_SIZE, TOTAL_BITS};
+    use super::BitmapSize;
+    use super::{Bitmap1024, ELEMENT_COUNT, ELEMENT_SIZE};
     use std::mem;
 
     #[test]
@@ -311,7 +317,7 @@ mod tests {
     #[test]
     fn constants_correct() {
         assert_eq!(ELEMENT_SIZE, mem::size_of::<usize>() * 8);
-        assert_eq!(TOTAL_BITS, 1_024);
-        assert_eq!(ELEMENT_COUNT, (TOTAL_BITS / ELEMENT_SIZE as u64) as usize);
+        assert_eq!(Bitmap1024::MAP_LENGTH, 1_024);
+        assert_eq!(ELEMENT_COUNT, Bitmap1024::MAP_LENGTH / ELEMENT_SIZE);
     }
 }

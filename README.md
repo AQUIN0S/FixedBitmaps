@@ -27,7 +27,13 @@ use fixed_bitmaps::Bitmap64;
 
 // Multiple ways to create a new bitmap
 let empty = Bitmap64::default();
+let empty = Bitmap64::new(false);
+
 let full = Bitmap64::from(u64::MAX);
+let full = Bitmap64::new(true);
+
+let mask = Bitmap64::create_bit_mask(2, 6, true); // Creates bitmap with last bits 111100
+let mask = Bitmap64::create_bit_mask(2, 6, false); // Creates bitmap 11..11000011
 
 // Equivalent ways to create a bitmap with last bits 1001
 let bitmap = Bitmap64::from(9);
@@ -57,7 +63,8 @@ let and = bitmap1 & 0b1010;
 let or = bitmap1 | 0b1010;
 let xor = bitmap1 ^ 0b1010;
 
-// You can also use the not operator ! to get the flipped version of the bitmap
+// You can also use the not operator ! to get the flipped version of
+// the bitmap
 let flipped = !bitmap;
 
 // Aritmetic operators are currently used as exactly that, the following

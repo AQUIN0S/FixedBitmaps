@@ -1,4 +1,4 @@
-use fixed_bitmaps::{Bitmap128, Bitmap8, ConstantLength};
+use fixed_bitmaps::{Bitmap128, Bitmap8, BitmapSize};
 
 fn main() {
     // Creates an empty bitmap
