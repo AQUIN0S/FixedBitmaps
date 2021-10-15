@@ -1,4 +1,4 @@
-use fixed_bitmaps::BitmapArch;
+use fixed_bitmaps::{BitmapArch, ConstantLength};
 
 #[test]
 fn default_is_0() {
@@ -152,4 +152,47 @@ fn deref_works() {
     bitmap.set(4, true).unwrap();
     let value = *bitmap;
     assert_eq!(value, 17);
+}
+
+#[test]
+fn create_bit_mask_true() {
+    let a = BitmapArch::create_bit_mask(3, 6, true);
+    let b = BitmapArch::create_bit_mask(7, 8, true);
+    let c = BitmapArch::create_bit_mask(0, 1, true);
+    let d = BitmapArch::create_bit_mask(0, 0, true);
+    let e = BitmapArch::create_bit_mask(8, 8, true);
+    let f = BitmapArch::create_bit_mask(0, BitmapArch::MAP_LENGTH, true);
+    assert_eq!(*a, 0b111000);
+    assert_eq!(*b, 0b10000000);
+    assert_eq!(*c, 0b1);
+    assert_eq!(*d, 0);
+    assert_eq!(*e, 0);
+    assert_eq!(*f, usize::MAX);
+}
+
+#[test]
+fn create_bit_mask_false() {
+    let a = BitmapArch::create_bit_mask(3, 6, false);
+    let b = BitmapArch::create_bit_mask(7, 8, false);
+    let c = BitmapArch::create_bit_mask(0, 1, false);
+    let d = BitmapArch::create_bit_mask(0, 0, false);
+    let e = BitmapArch::create_bit_mask(BitmapArch::MAP_LENGTH, BitmapArch::MAP_LENGTH, false);
+    let f = BitmapArch::create_bit_mask(0, BitmapArch::MAP_LENGTH, false);
+    assert_eq!(
+        a,
+        BitmapArch::create_bit_mask(0, 3, true)
+            | BitmapArch::create_bit_mask(6, BitmapArch::MAP_LENGTH, true)
+    );
+    assert_eq!(
+        b,
+        BitmapArch::create_bit_mask(0, 7, true)
+            | BitmapArch::create_bit_mask(8, BitmapArch::MAP_LENGTH, true)
+    );
+    assert_eq!(
+        c,
+        BitmapArch::create_bit_mask(1, BitmapArch::MAP_LENGTH, true)
+    );
+    assert_eq!(*d, usize::MAX);
+    assert_eq!(*e, usize::MAX);
+    assert_eq!(*f, 0);
 }

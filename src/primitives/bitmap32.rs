@@ -1,3 +1,4 @@
+use super::ConstantLength;
 use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -8,8 +9,6 @@ use std::{
         DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
-
-const MAP_LENGTH: usize = mem::size_of::<u32>() * 8;
 
 /// A bitmap of length 32.
 ///
@@ -49,11 +48,41 @@ pub struct Bitmap32(u32);
 
 impl Bitmap32 {
     pub fn capacity() -> usize {
-        MAP_LENGTH
+        Bitmap32::MAP_LENGTH
     }
 
     pub fn to_u32(&self) -> u32 {
         self.0
+    }
+
+    pub fn new(value: bool) -> Bitmap32 {
+        Bitmap32(if value { u32::MAX } else { 0 })
+    }
+
+    /// Create a new bitmap that has its bits set from `begin` (inclusive) to `end` (exclusive).
+    /// If begin is greater than the map length or end is 0, will return an empty bitmap.
+    pub fn create_bit_mask(begin: usize, end: usize, value: bool) -> Bitmap32 {
+        if value {
+            if begin >= Bitmap32::MAP_LENGTH || end < 1 {
+                Bitmap32(0)
+            } else if end >= Bitmap32::MAP_LENGTH {
+                Bitmap32(u32::MAX << begin)
+            } else {
+                Bitmap32(u32::MAX << begin & u32::MAX >> Bitmap32::MAP_LENGTH - end)
+            }
+        } else {
+            if begin >= Bitmap32::MAP_LENGTH || end < 1 {
+                Bitmap32(u32::MAX)
+            } else if begin == 0 && end >= Bitmap32::MAP_LENGTH {
+                Bitmap32(0)
+            } else if end >= Bitmap32::MAP_LENGTH {
+                Bitmap32(u32::MAX >> Bitmap32::MAP_LENGTH - begin)
+            } else if begin < 1 {
+                Bitmap32(u32::MAX << end)
+            } else {
+                Bitmap32(u32::MAX >> Bitmap32::MAP_LENGTH - begin | u32::MAX << end)
+            }
+        }
     }
 
     /// Creates a new, empty `Bitmap32`, and sets the desired index before returning.
@@ -71,7 +100,7 @@ impl Bitmap32 {
     /// assert_eq!(a, b);
     /// ```
     pub fn from_set(index: usize) -> Option<Bitmap32> {
-        if index >= MAP_LENGTH {
+        if index >= Bitmap32::MAP_LENGTH {
             return None;
         }
 
@@ -101,10 +130,10 @@ impl Bitmap32 {
     /// assert_eq!(*bitmap, 16);
     /// ```
     pub fn set(&mut self, index: usize, value: bool) -> Result<(), String> {
-        if index >= MAP_LENGTH {
+        if index >= Bitmap32::MAP_LENGTH {
             return Err(String::from(
                 "Tried to set bit that's out of range of the bitmap (range: ",
-            ) + &MAP_LENGTH.to_string()
+            ) + &Bitmap32::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -119,6 +148,14 @@ impl Bitmap32 {
         }
 
         Ok(())
+    }
+
+    pub fn set_range(&mut self, begin: usize, end: usize, value: bool) {
+        if value {
+            *self |= Bitmap32::create_bit_mask(begin, end, true);
+        } else {
+            *self &= Bitmap32::create_bit_mask(begin, end, false);
+        }
     }
 
     /// Gets the bit at the given index. Note that indexing starts at 0.
@@ -143,10 +180,10 @@ impl Bitmap32 {
     /// assert_eq!(bitmap.get(3).unwrap(), true);
     /// ```
     pub fn get(&self, index: usize) -> Result<bool, String> {
-        if index >= MAP_LENGTH {
+        if index >= Bitmap32::MAP_LENGTH {
             return Err(String::from(
                 "Tried to get bit that's out of range of the bitmap (range: ",
-            ) + &MAP_LENGTH.to_string()
+            ) + &Bitmap32::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -159,11 +196,7 @@ impl Bitmap32 {
 
 impl Display for Bitmap32 {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let mut bitmap = String::new();
-        for i in 0..MAP_LENGTH {
-            bitmap.push_str(&(if self.0 & (1 << i) > 0 { 1 } else { 0 }).to_string());
-        }
-        write!(f, "{}", bitmap.chars().rev().collect::<String>())
+        write!(f, "{:b}", self.0)
     }
 }
 
@@ -171,6 +204,10 @@ impl From<u32> for Bitmap32 {
     fn from(value: u32) -> Self {
         Bitmap32(value)
     }
+}
+
+impl ConstantLength for Bitmap32 {
+    const MAP_LENGTH: usize = mem::size_of::<u32>() * 8;
 }
 
 // Traits implementing bitwise operations between Bitmaps of the same type

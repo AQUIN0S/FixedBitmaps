@@ -1,4 +1,4 @@
-use fixed_bitmaps::Bitmap32;
+use fixed_bitmaps::{Bitmap32, ConstantLength};
 
 #[test]
 fn default_is_0() {
@@ -152,4 +152,47 @@ fn deref_works() {
     bitmap.set(4, true).unwrap();
     let value = *bitmap;
     assert_eq!(value, 17);
+}
+
+#[test]
+fn create_bit_mask_true() {
+    let a = Bitmap32::create_bit_mask(3, 6, true);
+    let b = Bitmap32::create_bit_mask(7, 8, true);
+    let c = Bitmap32::create_bit_mask(0, 1, true);
+    let d = Bitmap32::create_bit_mask(0, 0, true);
+    let e = Bitmap32::create_bit_mask(8, 8, true);
+    let f = Bitmap32::create_bit_mask(0, Bitmap32::MAP_LENGTH, true);
+    assert_eq!(*a, 0b111000);
+    assert_eq!(*b, 0b10000000);
+    assert_eq!(*c, 0b1);
+    assert_eq!(*d, 0);
+    assert_eq!(*e, 0);
+    assert_eq!(*f, u32::MAX);
+}
+
+#[test]
+fn create_bit_mask_false() {
+    let a = Bitmap32::create_bit_mask(3, 6, false);
+    let b = Bitmap32::create_bit_mask(7, 8, false);
+    let c = Bitmap32::create_bit_mask(0, 1, false);
+    let d = Bitmap32::create_bit_mask(0, 0, false);
+    let e = Bitmap32::create_bit_mask(Bitmap32::MAP_LENGTH, Bitmap32::MAP_LENGTH, false);
+    let f = Bitmap32::create_bit_mask(0, Bitmap32::MAP_LENGTH, false);
+    assert_eq!(
+        a,
+        Bitmap32::create_bit_mask(0, 3, true)
+            | Bitmap32::create_bit_mask(6, Bitmap32::MAP_LENGTH, true)
+    );
+    assert_eq!(
+        b,
+        Bitmap32::create_bit_mask(0, 7, true)
+            | Bitmap32::create_bit_mask(8, Bitmap32::MAP_LENGTH, true)
+    );
+    assert_eq!(
+        c,
+        Bitmap32::create_bit_mask(1, Bitmap32::MAP_LENGTH, true)
+    );
+    assert_eq!(*d, u32::MAX);
+    assert_eq!(*e, u32::MAX);
+    assert_eq!(*f, 0);
 }

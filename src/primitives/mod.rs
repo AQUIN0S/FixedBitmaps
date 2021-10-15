@@ -5,6 +5,10 @@ mod bitmap64;
 mod bitmap8;
 mod bitmap_arch;
 
+pub trait ConstantLength {
+    const MAP_LENGTH: usize;
+}
+
 pub use bitmap128::Bitmap128;
 pub use bitmap16::Bitmap16;
 pub use bitmap32::Bitmap32;

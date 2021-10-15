@@ -1,4 +1,4 @@
-use fixed_bitmaps::Bitmap8;
+use fixed_bitmaps::{Bitmap128, Bitmap8, ConstantLength};
 
 fn main() {
     // Creates an empty bitmap
@@ -38,4 +38,29 @@ fn main() {
     let b = Bitmap8::from(0b100);
 
     assert!(a == b);
+
+    let bitmap = Bitmap8::create_bit_mask(3, 6, true);
+    println!("{}", bitmap);
+    println!("{}", *bitmap);
+    println!("{}", 0b111000);
+
+    println!("{:b}", u8::MAX << 3);
+
+    let bitmap = Bitmap8::create_bit_mask(3, 6, false);
+    println!("{}", bitmap);
+    println!("{:b}", u8::MAX.wrapping_shl(8));
+
+    let a = Bitmap128::create_bit_mask(3, 6, false);
+    let b = Bitmap128::create_bit_mask(7, 8, false);
+    let c = Bitmap128::create_bit_mask(0, 1, false);
+    let d = Bitmap128::create_bit_mask(0, 0, false);
+    let e = Bitmap128::create_bit_mask(8, 8, false);
+    let f = Bitmap128::create_bit_mask(0, Bitmap128::MAP_LENGTH, false);
+
+    println!("{}", a);
+    println!("{}", b);
+    println!("{}", c);
+    println!("{}", d);
+    println!("{}", e);
+    println!("{}", f);
 }

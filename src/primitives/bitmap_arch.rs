@@ -1,3 +1,4 @@
+use super::ConstantLength;
 use core::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -8,8 +9,6 @@ use std::{
         DivAssign, Mul, MulAssign, Not, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
     },
 };
-
-const MAP_LENGTH: usize = mem::size_of::<usize>() * 8;
 
 /// A bitmap of length usize.
 ///
@@ -49,11 +48,41 @@ pub struct BitmapArch(usize);
 
 impl BitmapArch {
     pub fn capacity() -> usize {
-        MAP_LENGTH
+        BitmapArch::MAP_LENGTH
     }
 
     pub fn to_usize(&self) -> usize {
         self.0
+    }
+
+    pub fn new(value: bool) -> BitmapArch {
+        BitmapArch(if value { usize::MAX } else { 0 })
+    }
+
+    /// Create a new bitmap that has its bits set from `begin` (inclusive) to `end` (exclusive).
+    /// If begin is greater than the map length or end is 0, will return an empty bitmap.
+    pub fn create_bit_mask(begin: usize, end: usize, value: bool) -> BitmapArch {
+        if value {
+            if begin >= BitmapArch::MAP_LENGTH || end < 1 {
+                BitmapArch(0)
+            } else if end >= BitmapArch::MAP_LENGTH {
+                BitmapArch(usize::MAX << begin)
+            } else {
+                BitmapArch(usize::MAX << begin & usize::MAX >> BitmapArch::MAP_LENGTH - end)
+            }
+        } else {
+            if begin >= BitmapArch::MAP_LENGTH || end < 1 {
+                BitmapArch(usize::MAX)
+            } else if begin == 0 && end >= BitmapArch::MAP_LENGTH {
+                BitmapArch(0)
+            } else if end >= BitmapArch::MAP_LENGTH {
+                BitmapArch(usize::MAX >> BitmapArch::MAP_LENGTH - begin)
+            } else if begin < 1 {
+                BitmapArch(usize::MAX << end)
+            } else {
+                BitmapArch(usize::MAX >> BitmapArch::MAP_LENGTH - begin | usize::MAX << end)
+            }
+        }
     }
 
     /// Creates a new, empty `BitmapArch`, and sets the desired index before returning.
@@ -71,7 +100,7 @@ impl BitmapArch {
     /// assert_eq!(a, b);
     /// ```
     pub fn from_set(index: usize) -> Option<BitmapArch> {
-        if index >= MAP_LENGTH {
+        if index >= BitmapArch::MAP_LENGTH {
             return None;
         }
 
@@ -101,10 +130,10 @@ impl BitmapArch {
     /// assert_eq!(*bitmap, 16);
     /// ```
     pub fn set(&mut self, index: usize, value: bool) -> Result<(), String> {
-        if index >= MAP_LENGTH {
+        if index >= BitmapArch::MAP_LENGTH {
             return Err(String::from(
                 "Tried to set bit that's out of range of the bitmap (range: ",
-            ) + &MAP_LENGTH.to_string()
+            ) + &BitmapArch::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -119,6 +148,14 @@ impl BitmapArch {
         }
 
         Ok(())
+    }
+
+    pub fn set_range(&mut self, begin: usize, end: usize, value: bool) {
+        if value {
+            *self |= BitmapArch::create_bit_mask(begin, end, true);
+        } else {
+            *self &= BitmapArch::create_bit_mask(begin, end, false);
+        }
     }
 
     /// Gets the bit at the given index. Note that indexing starts at 0.
@@ -143,10 +180,10 @@ impl BitmapArch {
     /// assert_eq!(bitmap.get(3).unwrap(), true);
     /// ```
     pub fn get(&self, index: usize) -> Result<bool, String> {
-        if index >= MAP_LENGTH {
+        if index >= BitmapArch::MAP_LENGTH {
             return Err(String::from(
                 "Tried to get bit that's out of range of the bitmap (range: ",
-            ) + &MAP_LENGTH.to_string()
+            ) + &BitmapArch::MAP_LENGTH.to_string()
                 + ", index: "
                 + &index.to_string()
                 + ")");
@@ -159,11 +196,7 @@ impl BitmapArch {
 
 impl Display for BitmapArch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let mut bitmap = String::new();
-        for i in 0..MAP_LENGTH {
-            bitmap.push_str(&(if self.0 & (1 << i) > 0 { 1 } else { 0 }).to_string());
-        }
-        write!(f, "{}", bitmap.chars().rev().collect::<String>())
+        write!(f, "{:b}", self.0)
     }
 }
 
@@ -171,6 +204,10 @@ impl From<usize> for BitmapArch {
     fn from(value: usize) -> Self {
         BitmapArch(value)
     }
+}
+
+impl ConstantLength for BitmapArch {
+    const MAP_LENGTH: usize = mem::size_of::<usize>() * 8;
 }
 
 // Traits implementing bitwise operations between Bitmaps of the same type
