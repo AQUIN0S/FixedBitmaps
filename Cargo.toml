@@ -1,6 +1,6 @@
 [package]
 name = "fixed_bitmaps"
-version = "0.9.3"
+version = "0.10.0"
 edition = "2018"
 license = "MIT OR Apache-2.0"
 documentation = "https://docs.rs/fixed_bitmaps"
