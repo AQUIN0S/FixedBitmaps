@@ -81,6 +81,14 @@ impl Bitmap1024 {
         bitmap.set(index, true).unwrap();
         Some(bitmap)
     }
+
+    pub fn new(value: bool) -> Bitmap1024 {
+        Bitmap1024(if value {
+            [usize::MAX; ELEMENT_COUNT]
+        } else {
+            [0; ELEMENT_COUNT]
+        })
+    }
 }
 
 impl Display for Bitmap1024 {
@@ -168,7 +176,7 @@ impl BitXorAssign for Bitmap1024 {
     }
 }
 
-// Traits implementing bitwise operations between Bitmaps of the same type
+// Traits implementing bitwise operations between Bitmaps and their respective array type
 
 impl BitAnd<[usize; ELEMENT_COUNT]> for Bitmap1024 {
     type Output = Self;

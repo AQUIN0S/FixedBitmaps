@@ -47,7 +47,14 @@ fn create_or_replace(
     replace: (&str, &str, &str, &str),
     with: Vec<(&str, &str, &str, &str)>,
 ) {
-    let original = fs::read_to_string(String::from(&src_dir_path) + replace.3 + ".rs").unwrap();
+    let original = match fs::read_to_string(String::from(&src_dir_path) + replace.3 + ".rs") {
+        Ok(contents) => contents,
+        Err(e) => panic!(
+            "Error: could not read file {}, caused by {}",
+            String::from(&src_dir_path) + replace.3 + ".rs",
+            e
+        ),
+    };
 
     for write_values in with {
         let path: PathBuf = [".", &src_dir_path, &(String::from(write_values.3) + ".rs")]
@@ -71,7 +78,7 @@ fn create_or_replace(
     }
 }
 
-fn create_or_replace_tests() {
+fn create_or_replace_primitive_tests() {
     create_or_replace(
         String::from("./tests/primitives/"),
         REPLACE_PRIMITIVES,
@@ -95,8 +102,17 @@ fn create_or_replace_oversized_modules() {
     );
 }
 
+fn create_or_replace_oversized_tests() {
+    create_or_replace(
+        String::from("./tests/oversized/"),
+        REPLACE_OVERSIZED,
+        Vec::from(WITH_OVERSIZED),
+    );
+}
+
 fn main() {
-    create_or_replace_tests();
+    create_or_replace_primitive_tests();
     create_or_replace_primitive_modules();
     create_or_replace_oversized_modules();
+    create_or_replace_oversized_tests();
 }

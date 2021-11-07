@@ -97,10 +97,14 @@ let rsh = bitmap2 >> 1;
 
 Contributions are always welcome, whether for better documentation, bugfixing or optimizations in the code itself!
 
-When making changes, only do so in the following two files (unless of course you plan to add a new module or something of the sort):
+When making changes, only do so in the following files (unless of course you plan to add a new module or something of the sort):
 
 - `fixed_bitmaps/src/primitives/bitmap128.rs`
-- `fixed_bitmaps/tests/primitives/test_bitmap128.rs`
+- `fixed_bitmaps/tests/primitives/bitmap128.rs`
+- `fixed_bitmaps/src/oversized/bitmap_kb.rs`
+- `fixed_bitmaps/tests/oversized/bitmap_kb.rs`
 
 You can then run `cargo run` on this project, and it will propogate changes to those files through to all of the other files in their
 respective directories, adapting the changes to match the particular primitive each module aims to support.
+
+Run `cargo test` to make sure your changes pass the tests currently implemented, or to run new tests that you set up!

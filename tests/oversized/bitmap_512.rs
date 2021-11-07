@@ -1,25 +1,25 @@
 use std::{convert::TryInto, mem::size_of};
 
-use fixed_bitmaps::{BitmapKB, BitmapSize};
+use fixed_bitmaps::{Bitmap512, BitmapSize};
 
 const SIZE_USIZE: usize = size_of::<usize>() * 8;
-const NUM_ELEMENTS: usize = BitmapKB::MAP_LENGTH / SIZE_USIZE;
+const NUM_ELEMENTS: usize = Bitmap512::MAP_LENGTH / SIZE_USIZE;
 
 #[test]
 fn default_is_0() {
-    let bitmap = BitmapKB::default();
+    let bitmap = Bitmap512::default();
     assert_eq!(*bitmap, [0; NUM_ELEMENTS]);
 }
 
 #[test]
 fn max_works_fine() {
-    let bitmap = BitmapKB::from([usize::MAX; NUM_ELEMENTS]);
+    let bitmap = Bitmap512::from([usize::MAX; NUM_ELEMENTS]);
     assert_eq!(*bitmap, [usize::MAX; NUM_ELEMENTS]);
 }
 
 #[test]
 fn copy_test() {
-    let a = BitmapKB::default();
+    let a = Bitmap512::default();
     let mut b = a;
     b += 1;
 
@@ -28,13 +28,13 @@ fn copy_test() {
 
 #[test]
 fn equality_test() {
-    let mut a = BitmapKB::default();
+    let mut a = Bitmap512::default();
     a.set(1054, true).unwrap();
     a.set(1000, true).unwrap();
-    let mut b = BitmapKB::default();
+    let mut b = Bitmap512::default();
     b.set(1054, true).unwrap();
     b.set(1000, true).unwrap();
-    let mut c = BitmapKB::default();
+    let mut c = Bitmap512::default();
     c.set(1054, true).unwrap();
     assert_eq!(a, b);
     assert_ne!(a, c);
@@ -42,16 +42,16 @@ fn equality_test() {
 
 #[test]
 fn and_functionality() {
-    let mut a = BitmapKB::new(false);
-    let mut b = BitmapKB::new(false);
-    let mut c = BitmapKB::new(false);
+    let mut a = Bitmap512::new(false);
+    let mut b = Bitmap512::new(false);
+    let mut c = Bitmap512::new(false);
 
     let mut array_a = [0; NUM_ELEMENTS];
     let mut array_b = [0; NUM_ELEMENTS];
     let mut array_c = [0; NUM_ELEMENTS];
 
-    let empty_mask = BitmapKB::default();
-    let full_mask = BitmapKB::new(true);
+    let empty_mask = Bitmap512::default();
+    let full_mask = Bitmap512::new(true);
 
     for i in 50..54 {
         a.set(i, true).unwrap();
@@ -87,9 +87,9 @@ fn and_functionality() {
     array_c[NUM_ELEMENTS - 1 - 102 / SIZE_USIZE] +=
         2usize.pow((102 % SIZE_USIZE).try_into().unwrap());
 
-    let mut first_test = BitmapKB::default();
-    let mut second_test = BitmapKB::default();
-    let mut third_test = BitmapKB::default();
+    let mut first_test = Bitmap512::default();
+    let mut second_test = Bitmap512::default();
+    let mut third_test = Bitmap512::default();
 
     first_test.set(50, true).unwrap();
     first_test.set(51, true).unwrap();
@@ -119,12 +119,12 @@ fn and_functionality() {
 
 // #[test]
 // fn or_functionality() {
-//     let a = BitmapKB::from(0b11110000);
-//     let b = BitmapKB::from(0b11001100);
-//     let c = BitmapKB::from(0b10101010);
+//     let a = Bitmap512::from(0b11110000);
+//     let b = Bitmap512::from(0b11001100);
+//     let c = Bitmap512::from(0b10101010);
 
-//     let empty_mask = BitmapKB::default();
-//     let full_mask = BitmapKB::from(u128::MAX);
+//     let empty_mask = Bitmap512::default();
+//     let full_mask = Bitmap512::from(u128::MAX);
 
 //     assert_eq!((a | b).to_u128(), 0b11111100);
 //     assert_eq!((a | c).to_u128(), 0b11111010);
@@ -145,12 +145,12 @@ fn and_functionality() {
 
 // #[test]
 // fn xor_functionality() {
-//     let a = BitmapKB::from(0b11110000);
-//     let b = BitmapKB::from(0b11001100);
-//     let c = BitmapKB::from(0b10101010);
+//     let a = Bitmap512::from(0b11110000);
+//     let b = Bitmap512::from(0b11001100);
+//     let c = Bitmap512::from(0b10101010);
 
-//     let empty_mask = BitmapKB::default();
-//     let full_mask = BitmapKB::from(u128::MAX);
+//     let empty_mask = Bitmap512::default();
+//     let full_mask = Bitmap512::from(u128::MAX);
 
 //     assert_eq!((a ^ b).to_u128(), 0b00111100);
 //     assert_eq!((a ^ c).to_u128(), 0b01011010);
@@ -167,49 +167,49 @@ fn and_functionality() {
 
 // #[test]
 // fn not_functionality() {
-//     let a = BitmapKB::default();
-//     let b = BitmapKB::from(u128::MAX);
-//     let c = BitmapKB::from(0b1010);
+//     let a = Bitmap512::default();
+//     let b = Bitmap512::from(u128::MAX);
+//     let c = Bitmap512::from(0b1010);
 
 //     assert_eq!(!a, b);
 //     assert_eq!(!b, a);
 
 //     // !c is actually 1111...0101
-//     assert_ne!(!c, BitmapKB::from(0b0101));
-//     assert_eq!(!c, BitmapKB::from(u128::MAX - 0b1010));
+//     assert_ne!(!c, Bitmap512::from(0b0101));
+//     assert_eq!(!c, Bitmap512::from(u128::MAX - 0b1010));
 // }
 
 // #[test]
 // #[should_panic]
 // fn add_over_limit() {
-//     let mut bitmap = BitmapKB::from(u128::MAX);
+//     let mut bitmap = Bitmap512::from(u128::MAX);
 //     bitmap += 1;
 // }
 
 // #[test]
 // #[should_panic]
 // fn subtract_to_negative() {
-//     let mut bitmap = BitmapKB::default();
+//     let mut bitmap = Bitmap512::default();
 //     bitmap -= 1;
 // }
 
 // #[test]
 // #[should_panic]
 // fn divide_by_0() {
-//     let mut bitmap = BitmapKB::from(1);
+//     let mut bitmap = Bitmap512::from(1);
 //     bitmap /= 0;
 // }
 
 // #[test]
 // #[should_panic]
 // fn multiply_over_limit() {
-//     let mut bitmap = BitmapKB::from(u128::MAX);
+//     let mut bitmap = Bitmap512::from(u128::MAX);
 //     bitmap *= 2;
 // }
 
 // #[test]
 // fn deref_works() {
-//     let mut bitmap = BitmapKB::from(1);
+//     let mut bitmap = Bitmap512::from(1);
 //     bitmap.set(4, true).unwrap();
 //     let value = *bitmap;
 //     assert_eq!(value, 17);
